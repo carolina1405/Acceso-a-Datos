@@ -1,9 +1,13 @@
 import java.util.Objects;
 
-public class Cliente implements Comparable<Cliente> {
+public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
+    //=========================================================
+    //Atributos
     private final int ID;
     private String nombre, telefono, matricula;
 
+    //=========================================================
+    //Constructor
     public Cliente(int ID, String nombre, String telefono, String matricula) {
         this.ID = ID;
         this.nombre = nombre;
@@ -11,7 +15,8 @@ public class Cliente implements Comparable<Cliente> {
         this.matricula = matricula;
     }
 
-
+    //=========================================================
+    //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(Cliente o) {
         int resultado =  this.nombre.compareTo(o.nombre);
@@ -35,6 +40,8 @@ public class Cliente implements Comparable<Cliente> {
         return Objects.hash(ID, matricula);
     }
 
+    //=========================================================
+    //G/S
     public int getID() {
         return ID;
     }
@@ -61,5 +68,19 @@ public class Cliente implements Comparable<Cliente> {
 
     public void setMatricula(String matricula) {
         this.matricula = matricula;
+    }
+
+
+    //=========================================================
+    //CSV
+    @Override
+    public String toCSV(Object obj) {
+        return this.ID+","+this.nombre+","+this.telefono+","+this.matricula;
+    }
+
+    @Override
+    public Cliente fromCSV(String line) {
+        String[] splited = line.split(",");
+        return new Cliente(Integer.valueOf(splited[0]), splited[1], splited[2], splited[3]);
     }
 }
