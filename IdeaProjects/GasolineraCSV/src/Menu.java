@@ -37,6 +37,34 @@ public class Menu {
 
     }
 
+
+    //-------------------------------------------------------------------------------------------------------
+    // El conjunto principal de métodos que implementará nuestro menú. Aún son prototipos, por lo que no hacen gran cosa.
+
+    private void altaCliente(){
+        System.out.println("Damos de alta a un cliente");
+    }
+    private void listarClientes(){
+        System.out.println("Listamos a todos los clientes");
+    }
+    private void buscarClientes(){
+        System.out.println("Buscamos a un cliente");
+    }
+    private void procesarPagoRepostaje(){
+        System.out.println("Procesamos un pago");
+    }
+    private void consultarPagos(){
+        System.out.println("Consultamos los pagos");
+    }
+    //-------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
     //-------------------------------------------------------------------------------------------------------
     //Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
 
