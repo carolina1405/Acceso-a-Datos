@@ -20,15 +20,35 @@ public class Menu {
             opcion = comprobarOpcion(sc);
 
             switch(opcion){
-//                case 1 -> ;
-//                case 2 -> ;
-//                case 3 -> ;
-//                case 4 -> ;
-//                case 5 -> ;
+                case 1 -> {
+                    System.out.println("===================================================================");
+                    altaCliente();
+                    System.out.println("===================================================================");
+                }
+                case 2 ->{
+                    System.out.println("===================================================================");
+                    listarClientes();
+                    System.out.println("===================================================================");
+                }
+                case 3 ->{
+                    System.out.println("===================================================================");
+                    buscarClientes();
+                    System.out.println("===================================================================");
+                }
+                case 4 ->{
+                    System.out.println("===================================================================");
+                    procesarPagoRepostaje();
+                    System.out.println("===================================================================");
+                }
+                case 5 ->{
+                    System.out.println("===================================================================");
+                    consultarPagos();
+                    System.out.println("===================================================================");
+                }
                 default -> {
-                    System.out.println("=========================");
+                    System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
-                    System.out.println("=========================");
+                    System.out.println("===================================================================");
                 }
             }
         }while(opcion != 0);
@@ -66,7 +86,7 @@ public class Menu {
 
 
     //-------------------------------------------------------------------------------------------------------
-    //Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
+    // Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
 
     private byte comprobarOpcion(Scanner sc){
         byte num = 0;

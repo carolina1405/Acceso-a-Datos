@@ -1,5 +1,5 @@
-public interface CSVConverter<T> {
+public interface CSVConverter<T extends Object> {
     //Interfaz diseñada para que cada clase pueda convertirse a formato CSV según sus características y reconvertirse en un objeto.
-    public String toCSV(Object obj);
-    public Object fromCSV(String line);
+    String toCSV(T obj);
+    T fromCSV(String line);
 }

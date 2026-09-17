@@ -1,12 +1,16 @@
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class PagoRepostaje implements Comparable<PagoRepostaje>{
+public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<PagoRepostaje>{
+    //=========================================================
+    //Atributos
     private int id, idCliente;
     private LocalDate fecha;
     private double importe, litros;
     private String combustible;
 
+    //=========================================================
+    //Constructor
     public PagoRepostaje(int id, int idCliente, LocalDate fecha, double importe, double litros, String combustible) {
         this.id = id;
         this.idCliente = idCliente;
@@ -17,6 +21,8 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
     }
 
 
+    //=========================================================
+    //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(PagoRepostaje o) {
         int resultado = this.fecha.compareTo(o.fecha);
@@ -44,6 +50,8 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
         return id;
     }
 
+    //=========================================================
+    //G/S
     public void setId(int id) {
         this.id = id;
     }
@@ -86,5 +94,19 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
 
     public void setCombustible(String combustible) {
         this.combustible = combustible;
+    }
+
+    //=========================================================
+    //CSV
+    @Override
+    public String toCSV(PagoRepostaje obj) {
+        return this.id+","+this.idCliente+","+this.fecha+","+this.importe+","+this.litros+","+this.combustible;
+    }
+
+    @Override
+    public PagoRepostaje fromCSV(String line) {
+        String[] splited = line.split(",");
+        return new PagoRepostaje(Integer.valueOf(splited[0]), Integer.valueOf(splited[1]), LocalDate.parse(splited[2]),
+                Double.valueOf(splited[3]), Double.valueOf(splited[4]), splited[5]);
     }
 }

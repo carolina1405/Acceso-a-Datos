@@ -74,7 +74,7 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
     //=========================================================
     //CSV
     @Override
-    public String toCSV(Object obj) {
+    public String toCSV(Cliente obj) {
         return this.ID+","+this.nombre+","+this.telefono+","+this.matricula;
     }
 
