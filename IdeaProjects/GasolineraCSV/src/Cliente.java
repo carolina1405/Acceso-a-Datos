@@ -30,9 +30,10 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Cliente cliente = (Cliente) o;
-        return ID == cliente.ID && Objects.equals(matricula, cliente.matricula);
+        if(this.ID == ((Cliente)o).ID && this.matricula.equalsIgnoreCase(((Cliente)o).getMatricula())){
+            return true;
+        }
+        return false;
     }
 
     @Override

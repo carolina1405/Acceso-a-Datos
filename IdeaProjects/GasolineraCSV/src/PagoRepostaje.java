@@ -36,9 +36,10 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        PagoRepostaje that = (PagoRepostaje) o;
-        return id == that.id;
+        if(this.id == ((PagoRepostaje)o).id){
+            return true;
+        }
+        return false;
     }
 
     @Override
