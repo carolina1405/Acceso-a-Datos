@@ -30,7 +30,7 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
 
     @Override
     public boolean equals(Object o) {
-        if(this.ID == ((Cliente)o).ID && this.matricula.equalsIgnoreCase(((Cliente)o).getMatricula())){
+        if(this.ID == ((Cliente)o).ID){
             return true;
         }
         return false;
@@ -38,7 +38,7 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ID, matricula);
+        return Objects.hash(ID);
     }
 
     //=========================================================

@@ -15,6 +15,7 @@ public class Menu {
 
         byte opcion;
 
+        //Funcionalidad tras el menú.
         do{
             System.out.println(menuText);
             opcion = comprobarOpcion(sc);

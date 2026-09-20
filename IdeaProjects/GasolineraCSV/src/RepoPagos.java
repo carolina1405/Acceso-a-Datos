@@ -1,20 +1,19 @@
-import java.io.File;
 import java.util.Set;
 
 public class RepoPagos extends Repositorio<PagoRepostaje>{
 
-    public RepoPagos(String separador, File archivo) {
-        super(separador, archivo);
+    public RepoPagos(String directorio, String fichero) {
+        super(directorio, fichero);
     }
 
     @Override
-    protected boolean guardar(PagoRepostaje objeto) {
-        return false;
+    protected void guardar(PagoRepostaje objeto) {
+        System.out.println("Se guarda un pago");
     }
 
     @Override
     protected void recuperar(String clave) {
-
+        System.out.println("Se recupera un pago");
     }
 
     @Override

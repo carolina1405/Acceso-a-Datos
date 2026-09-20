@@ -1,20 +1,19 @@
-import java.io.File;
 import java.util.Set;
 
 public class RepoCliente extends Repositorio<Cliente>{
 
-    public RepoCliente(String separador, File archivo) {
-        super(separador, archivo);
+    public RepoCliente(String directorio, String fichero) {
+        super(directorio, fichero);
     }
 
     @Override
-    protected boolean guardar(Cliente objeto) {
-        return false;
+    protected void guardar(Cliente objeto) {
+        System.out.println("Se guarda un cliente");
     }
 
     @Override
     protected void recuperar(String clave) {
-
+        System.out.println("Se recupera un cliente");
     }
 
     @Override
