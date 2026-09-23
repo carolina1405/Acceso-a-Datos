@@ -12,11 +12,6 @@ public class RepoCliente extends Repositorio<Cliente>{
     }
 
     @Override
-    protected void recuperar(String clave) {
-        System.out.println("Se recupera un cliente");
-    }
-
-    @Override
     protected Set<Cliente> listar() {
         return Set.of();
     }

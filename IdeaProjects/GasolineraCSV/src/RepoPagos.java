@@ -12,11 +12,6 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     }
 
     @Override
-    protected void recuperar(String clave) {
-        System.out.println("Se recupera un pago");
-    }
-
-    @Override
     protected Set<PagoRepostaje> listar() {
         return Set.of();
     }

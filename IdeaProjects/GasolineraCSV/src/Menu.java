@@ -15,6 +15,7 @@ public class Menu {
 
         byte opcion;
 
+        //Recuperar clientes y pagos al inicio, en caso de crear ya un objeto o lista de objetos guardarlos al salir
         //Funcionalidad tras el menú.
         do{
             System.out.println(menuText);
@@ -23,60 +24,43 @@ public class Menu {
             switch(opcion){
                 case 1 -> {
                     System.out.println("===================================================================");
-                    altaCliente();
+                    Operaciones.altaCliente();
                     System.out.println("===================================================================");
                 }
                 case 2 ->{
                     System.out.println("===================================================================");
-                    listarClientes();
+                    Operaciones.listarClientes();
                     System.out.println("===================================================================");
                 }
                 case 3 ->{
                     System.out.println("===================================================================");
-                    buscarClientes();
+                    String clave = "";
+                    Operaciones.buscarClientes(clave);
                     System.out.println("===================================================================");
                 }
                 case 4 ->{
                     System.out.println("===================================================================");
-                    procesarPagoRepostaje();
+                    Operaciones.procesarPagoRepostaje();
                     System.out.println("===================================================================");
                 }
                 case 5 ->{
                     System.out.println("===================================================================");
-                    consultarPagos();
+                    Operaciones.consultarPagos();
                     System.out.println("===================================================================");
                 }
                 default -> {
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
+                    //Aqui se guardaran en un documento todos los clientes y pagos que se hayan creado nuevos.
                     System.out.println("===================================================================");
                 }
             }
         }while(opcion != 0);
-
-
-
     }
 
 
     //-------------------------------------------------------------------------------------------------------
-    // El conjunto principal de métodos que implementará nuestro menú. Aún son prototipos, por lo que no hacen gran cosa.
 
-    private void altaCliente(){
-        System.out.println("Damos de alta a un cliente");
-    }
-    private void listarClientes(){
-        System.out.println("Listamos a todos los clientes");
-    }
-    private void buscarClientes(){
-        System.out.println("Buscamos a un cliente");
-    }
-    private void procesarPagoRepostaje(){
-        System.out.println("Procesamos un pago");
-    }
-    private void consultarPagos(){
-        System.out.println("Consultamos los pagos");
-    }
     //-------------------------------------------------------------------------------------------------------
 
 

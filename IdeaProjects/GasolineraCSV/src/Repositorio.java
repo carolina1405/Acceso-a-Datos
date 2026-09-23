@@ -13,9 +13,6 @@ public abstract class Repositorio<T extends Object> {
     /*Métodos que podrán implementar las clases hijas en función del objeto para el
             cual esté dedicado el repositorio.*/
     protected abstract void guardar(T objeto);
-
-    protected abstract void recuperar(String clave);
-
     protected abstract Set<T> listar();
 
 
