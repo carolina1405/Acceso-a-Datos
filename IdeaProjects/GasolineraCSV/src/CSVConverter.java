@@ -7,6 +7,6 @@ public interface CSVConverter<T extends Object> {
     por lo que no tiene como función guardar ni sacar información de un documento.
     Esa función la cumplirán otras clases específicamente diseñadas para ello.*/
 
-    String toCSV(T obj);
+    String toCSV();
     T fromCSV(String line);
 }

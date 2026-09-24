@@ -1,9 +1,15 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
     public void mostrarMenu(){
 
+        //Hay que verificar si el archivo a leer ya esta creado y si no crearlo.
         Scanner sc = new Scanner(System.in);
         String menuText = "=== GESTIÓN DE GASOLINERA ===\n" +
                 "1. Dar de alta un cliente\n" +
@@ -15,7 +21,21 @@ public class Menu {
 
         byte opcion;
 
-        //Recuperar clientes y pagos al inicio, en caso de crear ya un objeto o lista de objetos guardarlos al salir
+
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------
+
+        RepoCliente repoCliente = new RepoCliente(".\\Archivos.csv", "Clientes");
+        RepoPagos repoPagos = new RepoPagos(".\\Archivos.csv", "Pagos");
+
+        List<Cliente> clientes = repoCliente.listar();
+        List<PagoRepostaje> pagos = repoPagos.listar();
+        //------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
         //Funcionalidad tras el menú.
         do{
             System.out.println(menuText);
@@ -24,51 +44,58 @@ public class Menu {
             switch(opcion){
                 case 1 -> {
                     System.out.println("===================================================================");
-                    Operaciones.altaCliente();
+                    clientes = Operaciones.altaCliente(clientes);
                     System.out.println("===================================================================");
                 }
                 case 2 ->{
                     System.out.println("===================================================================");
-                    Operaciones.listarClientes();
+                    Operaciones.listarClientes(clientes);
                     System.out.println("===================================================================");
                 }
                 case 3 ->{
                     System.out.println("===================================================================");
-                    String clave = "";
-                    Operaciones.buscarClientes(clave);
+                    Operaciones.buscarClientes(clientes);
                     System.out.println("===================================================================");
                 }
                 case 4 ->{
                     System.out.println("===================================================================");
-                    Operaciones.procesarPagoRepostaje();
+                    Operaciones.procesarPagoRepostaje(pagos, clientes);
                     System.out.println("===================================================================");
                 }
                 case 5 ->{
                     System.out.println("===================================================================");
-                    Operaciones.consultarPagos();
+                    Operaciones.consultarPagos(pagos);
                     System.out.println("===================================================================");
                 }
                 default -> {
+
+                    try(BufferedWriter out1 = Files.newBufferedWriter(repoCliente.getArchivoClientes());
+                        BufferedWriter out2 = Files.newBufferedWriter(repoPagos.getArchivoPagos())){
+                        for(Cliente c: clientes){
+                            String clienteEscritura = c.toCSV();
+                            out1.write(clienteEscritura);
+                            out1.newLine();
+                        }
+
+                        for(PagoRepostaje p : pagos){
+                            String pagoEscritura = p.toCSV();
+                            out2.write(pagoEscritura);
+                            out2.newLine();
+                        }
+
+                        System.out.println("Se han guardado los cambios.");
+                    }catch(IOException e){
+                        System.out.println(e.getMessage());
+                    }
+
+
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
-                    //Aqui se guardaran en un documento todos los clientes y pagos que se hayan creado nuevos.
                     System.out.println("===================================================================");
                 }
             }
         }while(opcion != 0);
     }
-
-
-    //-------------------------------------------------------------------------------------------------------
-
-    //-------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
 
     //-------------------------------------------------------------------------------------------------------
     // Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
@@ -97,7 +124,7 @@ public class Menu {
                 System.out.println("===============================================================================");
             }
         }
-
+        sc.nextLine();
         return num;
     }
 

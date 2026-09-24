@@ -7,11 +7,11 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
     private int id, idCliente;
     private LocalDate fecha;
     private double importe, litros;
-    private String combustible;
+    private Combustible combustible;
 
     //=========================================================
     //Constructor
-    public PagoRepostaje(int id, int idCliente, LocalDate fecha, double importe, double litros, String combustible) {
+    public PagoRepostaje(int id, int idCliente, LocalDate fecha, double importe, double litros, Combustible combustible) {
         this.id = id;
         this.idCliente = idCliente;
         this.fecha = fecha;
@@ -20,6 +20,8 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
         this.combustible = combustible;
     }
 
+    public PagoRepostaje() {
+    }
 
     //=========================================================
     //Overrides de Comparable, equals y hashcode
@@ -89,18 +91,18 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
         this.litros = litros;
     }
 
-    public String getCombustible() {
+    public Combustible getCombustible() {
         return combustible;
     }
 
-    public void setCombustible(String combustible) {
+    public void setCombustible(Combustible combustible) {
         this.combustible = combustible;
     }
 
     //=========================================================
     //CSV
     @Override
-    public String toCSV(PagoRepostaje obj) {
+    public String toCSV() {
         return this.id+","+this.idCliente+","+this.fecha+","+this.importe+","+this.litros+","+this.combustible;
     }
 
@@ -108,6 +110,19 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
     public PagoRepostaje fromCSV(String line) {
         String[] splited = line.split(",");
         return new PagoRepostaje(Integer.valueOf(splited[0]), Integer.valueOf(splited[1]), LocalDate.parse(splited[2]),
-                Double.valueOf(splited[3]), Double.valueOf(splited[4]), splited[5]);
+                Double.valueOf(splited[3]), Double.valueOf(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
+    }
+
+    //=========================================================
+
+
+    @Override
+    public String toString() {
+        return "ID: " + id +
+                ", ID del cliente: " + idCliente +
+                ", Fecha: " + fecha +
+                ", Importe: " + importe +
+                ", Litros: " + litros +
+                ", Combustible: " + combustible;
     }
 }

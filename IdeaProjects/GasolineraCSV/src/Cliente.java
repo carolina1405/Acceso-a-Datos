@@ -3,16 +3,19 @@ import java.util.Objects;
 public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
     //=========================================================
     //Atributos
-    private final int ID;
+    private int id;
     private String nombre, telefono, matricula;
 
     //=========================================================
     //Constructor
     public Cliente(int ID, String nombre, String telefono, String matricula) {
-        this.ID = ID;
+        this.id = id;
         this.nombre = nombre;
         this.telefono = telefono;
         this.matricula = matricula;
+    }
+
+    public Cliente() {
     }
 
     //=========================================================
@@ -24,13 +27,13 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
         if (resultado != 0){
             return resultado;
         }else{
-            return -(this.ID-o.ID);
+            return -(this.id-o.id);
         }
     }
 
     @Override
     public boolean equals(Object o) {
-        if(this.ID == ((Cliente)o).ID){
+        if(this.id == ((Cliente)o).id){
             return true;
         }
         return false;
@@ -38,13 +41,13 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ID);
+        return Objects.hash(id);
     }
 
     //=========================================================
     //G/S
     public int getID() {
-        return ID;
+        return id;
     }
 
     public String getNombre() {
@@ -75,13 +78,23 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
     //=========================================================
     //CSV
     @Override
-    public String toCSV(Cliente obj) {
-        return this.ID+","+this.nombre+","+this.telefono+","+this.matricula;
+    public String toCSV() {
+        return this.id+","+this.nombre+","+this.telefono+","+this.matricula;
     }
 
     @Override
     public Cliente fromCSV(String line) {
         String[] splited = line.split(",");
         return new Cliente(Integer.valueOf(splited[0]), splited[1], splited[2], splited[3]);
+    }
+
+    //=========================================================
+
+    @Override
+    public String toString() {
+        return "ID: " + id +
+                ", Nombre: '" + nombre + '\'' +
+                ", Teléfono: '" + telefono + '\'' +
+                ", Matrícula: '" + matricula + '\'' ;
     }
 }
