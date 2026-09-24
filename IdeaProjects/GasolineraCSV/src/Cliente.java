@@ -8,7 +8,7 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
 
     //=========================================================
     //Constructor
-    public Cliente(int ID, String nombre, String telefono, String matricula) {
+    public Cliente(int id, String nombre, String telefono, String matricula) {
         this.id = id;
         this.nombre = nombre;
         this.telefono = telefono;
@@ -22,12 +22,12 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
     //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(Cliente o) {
-        int resultado =  this.nombre.compareTo(o.nombre);
+        int resultado =  this.nombre.compareToIgnoreCase(o.nombre);
 
         if (resultado != 0){
             return resultado;
         }else{
-            return -(this.id-o.id);
+            return this.id-o.id;
         }
     }
 

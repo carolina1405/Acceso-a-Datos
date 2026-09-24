@@ -26,15 +26,12 @@ public class Menu {
 
         //------------------------------------------------------------------------------------------------------------------------------------
 
-        RepoCliente repoCliente = new RepoCliente(".\\Archivos.csv", "Clientes");
-        RepoPagos repoPagos = new RepoPagos(".\\Archivos.csv", "Pagos");
+        RepoCliente repoCliente = new RepoCliente(".\\ArchivosCSV", "Clientes");
+        RepoPagos repoPagos = new RepoPagos(".\\ArchivosCSV", "Pagos");
 
         List<Cliente> clientes = repoCliente.listar();
         List<PagoRepostaje> pagos = repoPagos.listar();
         //------------------------------------------------------------------------------------------------------------------------------------
-
-
-
 
         //Funcionalidad tras el menú.
         do{
@@ -69,26 +66,8 @@ public class Menu {
                 }
                 default -> {
 
-                    try(BufferedWriter out1 = Files.newBufferedWriter(repoCliente.getArchivoClientes());
-                        BufferedWriter out2 = Files.newBufferedWriter(repoPagos.getArchivoPagos())){
-                        for(Cliente c: clientes){
-                            String clienteEscritura = c.toCSV();
-                            out1.write(clienteEscritura);
-                            out1.newLine();
-                        }
-
-                        for(PagoRepostaje p : pagos){
-                            String pagoEscritura = p.toCSV();
-                            out2.write(pagoEscritura);
-                            out2.newLine();
-                        }
-
-                        System.out.println("Se han guardado los cambios.");
-                    }catch(IOException e){
-                        System.out.println(e.getMessage());
-                    }
-
-
+                    repoCliente.guardar(clientes);
+                    repoPagos.guardar(pagos);
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
                     System.out.println("===================================================================");

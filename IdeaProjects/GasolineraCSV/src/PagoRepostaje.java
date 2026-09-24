@@ -27,12 +27,12 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
     //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(PagoRepostaje o) {
-        int resultado = this.fecha.compareTo(o.fecha);
+        int resultado = o.fecha.compareTo(this.fecha);
 
         if (resultado != 0){
             return resultado;
         }else{
-            return this.id-o.id;
+            return -(this.id-o.id);
         }
     }
 

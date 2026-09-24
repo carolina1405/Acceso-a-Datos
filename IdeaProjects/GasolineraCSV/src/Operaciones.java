@@ -27,7 +27,7 @@ public class Operaciones {
                     throw new IllegalArgumentException("Teléfono no válido");
                 }else{
                     for(char c : telf.toCharArray()){
-                        if(!Character.isDigit(c)){
+                        if(!Character.isDigit(c) || !Character.isWhitespace(c)){
                             throw new IllegalArgumentException("Teléfono no válido");
                         }
                     }
@@ -95,30 +95,53 @@ public class Operaciones {
     //----------------------------------------------------------------
     public static void buscarClientes(List<Cliente> clientes){
         Scanner sc = new Scanner(System.in);
+        if(clientes.isEmpty()){
+            System.out.println("Aún no hay clientes en el sistema :(");
+        }else{
+            String clave = comprobarClave(sc);
+            System.out.println("Buscando...");
+            boolean coincidenciaNombre = false,
+                    coincidenciaTelefono = false,
+                    coincidenciaMatricula = false;
+            int contadorCoincidencias = 0;
 
-        System.out.print("Escribe una clave de búsqueda");
-        String clave = sc.nextLine().trim();
-        System.out.println("Buscando...");
-        boolean coincidenciaNombre = false,
-                coincidenciaTelefono = false,
-                coincidenciaMatricula = false;
-        int contadorCoincidencias = 0;
+            System.out.println("---- RESULTADOS DE BÚSQUEDA ----");
+            for(Cliente c: clientes){
+                coincidenciaNombre = c.getNombre().toUpperCase().contains(clave.toUpperCase());
+                coincidenciaTelefono = c.getTelefono().toUpperCase().contains(clave.toUpperCase());
+                coincidenciaMatricula = c.getMatricula().toUpperCase().contains(clave.toUpperCase());
 
-        System.out.println("---- RESULTADOS DE BÚSQUEDA ----");
-        for(Cliente c: clientes){
-            coincidenciaNombre = c.getNombre().toUpperCase().contains(clave.toUpperCase());
-            coincidenciaTelefono = c.getTelefono().toUpperCase().contains(clave.toUpperCase());
-            coincidenciaMatricula = c.getMatricula().toUpperCase().contains(clave.toUpperCase());
+                if(coincidenciaNombre || coincidenciaTelefono || coincidenciaMatricula){
+                    System.out.println(c.toString());
+                    contadorCoincidencias++;
+                }
+            }
+            if(contadorCoincidencias == 0){
+                System.out.println("No se han encontrado coincidencias.");
+            }
+            System.out.println("--------------------------------");
+        }
 
-            if(coincidenciaNombre || coincidenciaTelefono || coincidenciaMatricula){
-                System.out.println(c.toString());
-                contadorCoincidencias++;
+    }
+    public static String comprobarClave(Scanner sc){
+        String clave = "";
+        boolean valido = false;
+
+        while(!valido){
+            try{
+                System.out.print("Escribe una clave de búsqueda: ");
+                clave = sc.nextLine().trim();
+                if(clave.isBlank()){
+                    throw new IllegalArgumentException("Clave vacía");
+                }
+                valido = true;
+            }catch(IllegalArgumentException e){
+                System.out.println("========================================");
+                System.out.println("La clave de búsqueda no puede estar en blanco :(");
+                System.out.println("========================================");
             }
         }
-        if(contadorCoincidencias == 0){
-            System.out.println("No se han encontrado coincidencias.");
-        }
-        System.out.println("--------------------------------");
+        return clave;
     }
     //----------------------------------------------------------------
     public static List<PagoRepostaje> procesarPagoRepostaje(List<PagoRepostaje> pagos, List<Cliente> clientes){
@@ -129,7 +152,7 @@ public class Operaciones {
         }else{
             int idCliente = comprobarFormatoIDCliente(sc);
             if(idCliente < 1 || idCliente > clientes.size()){
-                System.out.println("El cliente con id "+idCliente+" no está registrado.");
+                System.out.println("El cliente con id "+idCliente+" no existe.");
             }else{
                 int idPago = pagos.size()+1;
                 LocalDate fecha = comprobarFormatoFecha(sc);
@@ -141,7 +164,7 @@ public class Operaciones {
                 System.out.println("-----------------------------------------");
                 System.out.println("Se ha guardado correctamente el pago con:" +
                         "\nID: "+pagos.get(pagos.size()-1).getId()+
-                        "\nCliente: "+clientes.get(pagos.get(pagos.size()-1).getIdCliente()-1)+
+                        "\nCliente: "+clientes.get(pagos.get(pagos.size()-1).getIdCliente()-1).getNombre()+
                         "\nImporte: "+pagos.get(pagos.size()-1).getImporte());
                 System.out.println("-----------------------------------------");
 
@@ -168,7 +191,7 @@ public class Operaciones {
             }catch(InputMismatchException e1){
                 sc.nextLine();
                 System.out.println("========================================");
-                System.out.println("Formato no válido :(");
+                System.out.println("ID no válido :(");
                 System.out.println("========================================");
             }catch(IllegalArgumentException e2){
                 System.out.println("========================================");
