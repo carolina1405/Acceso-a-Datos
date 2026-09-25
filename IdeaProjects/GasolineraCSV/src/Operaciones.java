@@ -26,8 +26,9 @@ public class Operaciones {
                 if(telf.isEmpty()){
                     throw new IllegalArgumentException("Teléfono no válido");
                 }else{
-                    for(char c : telf.toCharArray()){
-                        if(!Character.isDigit(c) || !Character.isWhitespace(c)){
+                    char[] telefonoCaracteres = telf.toCharArray();
+                    for(char c : telefonoCaracteres){
+                        if(!Character.isDigit(c) && !Character.isWhitespace(c)){
                             throw new IllegalArgumentException("Teléfono no válido");
                         }
                     }
