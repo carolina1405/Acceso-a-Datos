@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Menu {
     public void mostrarMenu(){
 
-        //Hay que verificar si el archivo a leer ya esta creado y si no crearlo.
+        //Hay que verificar si el archivo a leer ya está creado y si no lo está crearlo.
         Scanner sc = new Scanner(System.in);
         String menuText = "=== GESTIÓN DE GASOLINERA ===\n" +
                 "1. Dar de alta un cliente\n" +
@@ -16,11 +16,7 @@ public class Menu {
                 "0. Salir";
 
         byte opcion;
-
-
-
-
-        //------------------------------------------------------------------------------------------------------------------------------------
+        //====================================================================================================================================
 
         RepoCliente repoCliente = new RepoCliente(".\\ArchivosCSV", "Clientes");
         RepoPagos repoPagos = new RepoPagos(".\\ArchivosCSV", "Pagos");
@@ -33,11 +29,11 @@ public class Menu {
         do{
             System.out.println(menuText);
             opcion = comprobarOpcion(sc);
-
+            sc.nextLine();
             switch(opcion){
                 case 1 -> {
                     System.out.println("===================================================================");
-                    clientes = Operaciones.altaCliente(clientes);
+                    clientes = Operaciones.altaCliente(clientes, sc);
                     System.out.println("===================================================================");
                 }
                 case 2 ->{
@@ -47,12 +43,12 @@ public class Menu {
                 }
                 case 3 ->{
                     System.out.println("===================================================================");
-                    Operaciones.buscarClientes(clientes);
+                    Operaciones.buscarClientes(clientes, sc);
                     System.out.println("===================================================================");
                 }
                 case 4 ->{
                     System.out.println("===================================================================");
-                    Operaciones.procesarPagoRepostaje(pagos, clientes);
+                    Operaciones.procesarPagoRepostaje(pagos, clientes, sc);
                     System.out.println("===================================================================");
                 }
                 case 5 ->{
@@ -61,7 +57,6 @@ public class Menu {
                     System.out.println("===================================================================");
                 }
                 default -> {
-
                     repoCliente.guardar(clientes);
                     repoPagos.guardar(pagos);
                     System.out.println("===================================================================");
@@ -70,11 +65,11 @@ public class Menu {
                 }
             }
         }while(opcion != 0);
+        sc.close();  //Cerramos el Scanner
     }
 
     //-------------------------------------------------------------------------------------------------------
     // Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
-
     private byte comprobarOpcion(Scanner sc){
         byte num = 0;
         boolean valido = false;
@@ -82,7 +77,6 @@ public class Menu {
             try{
                 System.out.print("Opción: ");
                 num = sc.nextByte();
-
                 if(num > 5 || num < 0){
                     throw new IllegalArgumentException ("Fuera de rango.");
                 }
@@ -99,9 +93,7 @@ public class Menu {
                 System.out.println("===============================================================================");
             }
         }
-        sc.nextLine();
         return num;
     }
-
     //-------------------------------------------------------------------------------------------------------
 }

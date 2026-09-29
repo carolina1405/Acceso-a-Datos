@@ -8,37 +8,28 @@ import java.util.List;
 
 public class RepoCliente extends Repositorio<Cliente>{
 
+    //=========================================================
+    //Atributos
     private Path archivoClientes;
     private String cabecera;
-
+    //=========================================================
+    //Constructor
     public RepoCliente(String directorio, String archivoClientes) {
         super(directorio);
-        this.archivoClientes = Path.of(directorio, archivoClientes+".csv");
-        this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
-        if(Files.notExists(this.archivoClientes)){
-            try{
-                Files.createFile(this.archivoClientes);
 
-            }catch(IOException e){
-                System.out.println(e.getMessage());
-            }
-
-//            try(BufferedWriter out = Files.newBufferedWriter(this.archivoClientes)){
-//                out.write(cabecera);
-//            }catch (IOException e){
-//                System.out.println(e.getMessage());
-//            }
-
-        }
+        //Se generará un archivo cuyo nombre será pasado como parámetro
+        generarCSV(directorio, archivoClientes);
     }
-
+    //=========================================================
+    //Métodos
     @Override
     protected void guardar(List<Cliente> clientes) {
         try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
+            ClienteConverter converter = new ClienteConverter();
             out1.write(cabecera);
             out1.newLine();
             for(Cliente c: clientes){
-                String clienteEscritura = c.toCSV();
+                String clienteEscritura = converter.toCSV(c, ",");
                 out1.write(clienteEscritura);
                 out1.newLine();
             }
@@ -52,16 +43,15 @@ public class RepoCliente extends Repositorio<Cliente>{
 
     @Override
     protected List<Cliente> listar() {
-
+        ClienteConverter converter = new ClienteConverter();
         List<Cliente> clientes = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
 
+            in.readLine();
             String line = in.readLine();
-            line = in.readLine();
             while(line != null){
-                Cliente cliente = new Cliente();
-                clientes.add(cliente.fromCSV(line));
+                clientes.add(converter.fromCSV(line, ","));
                 line = in.readLine();
             }
 
@@ -71,6 +61,21 @@ public class RepoCliente extends Repositorio<Cliente>{
         return clientes;
     }
 
+    @Override
+    protected void generarCSV(String directorio, String archivoClientes){
+        this.archivoClientes = Path.of(directorio, archivoClientes+".csv");
+        this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
+        if(Files.notExists(this.archivoClientes)){
+            try{
+                Files.createFile(this.archivoClientes);
+
+            }catch(IOException e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+    //---------------------------------------------------------
+    //G/S
     public Path getArchivoClientes() {
         return archivoClientes;
     }
@@ -78,4 +83,6 @@ public class RepoCliente extends Repositorio<Cliente>{
     public void setArchivoClientes(Path archivoClientes) {
         this.archivoClientes = archivoClientes;
     }
+
+    //=========================================================
 }

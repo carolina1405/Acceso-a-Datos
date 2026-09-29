@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
+public class Cliente implements Comparable<Cliente> {
     //=========================================================
     //Atributos
     private int id;
@@ -15,22 +15,20 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
         this.matricula = matricula;
     }
 
-    public Cliente() {
-    }
-
     //=========================================================
     //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(Cliente o) {
-        int resultado =  this.nombre.compareToIgnoreCase(o.nombre);
+        int resultado =  this.nombre.compareToIgnoreCase(o.nombre); //Orden ascendente
 
-        if (resultado != 0){
+        if (resultado != 0){ //Si los nombres son iguales
             return resultado;
         }else{
-            return this.id-o.id;
+            return this.id-o.id; //Orden ascendente
         }
-    }
+    }  //Se establece un criterio de ordenación natural para los objetos de esta clase.
 
+    //Se hace @Override de equals y hashcode para asegurarnos de que el programa sepa en qué atributos basarse para determinar si 2 objetos de esta clase son  diferentes o no.
     @Override
     public boolean equals(Object o) {
         if(this.id == ((Cliente)o).id){
@@ -44,7 +42,7 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
         return Objects.hash(id);
     }
 
-    //=========================================================
+    //---------------------------------------------------------
     //G/S
     public int getID() {
         return id;
@@ -74,27 +72,16 @@ public class Cliente implements Comparable<Cliente>, CSVConverter<Cliente> {
         this.matricula = matricula;
     }
 
-
-    //=========================================================
-    //CSV
-    @Override
-    public String toCSV() {
-        return this.id+","+this.nombre+","+this.telefono+","+this.matricula;
-    }
-
-    @Override
-    public Cliente fromCSV(String line) {
-        String[] splited = line.split(",");
-        return new Cliente(Integer.valueOf(splited[0]), splited[1], splited[2], splited[3]);
-    }
-
-    //=========================================================
-
+    //---------------------------------------------------------
+    //toString
     @Override
     public String toString() {
         return "ID: " + id +
-                ", Nombre: '" + nombre + '\'' +
-                ", Teléfono: '" + telefono + '\'' +
-                ", Matrícula: '" + matricula + '\'' ;
+                " | Nombre: '" + nombre + '\'' +
+                " | Teléfono: '" + telefono + '\'' +
+                " | Matrícula: '" + matricula + '\'' ;
     }
+    //=========================================================
+
+
 }

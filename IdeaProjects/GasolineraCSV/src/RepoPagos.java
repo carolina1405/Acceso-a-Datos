@@ -8,35 +8,29 @@ import java.util.List;
 
 public class RepoPagos extends Repositorio<PagoRepostaje>{
 
+    //=========================================================
+    //Atributos
     private Path archivoPagos;
     private String cabecera;
 
+    //=========================================================
+    //Constructor
     public RepoPagos(String directorio, String archivoPagos) {
         super(directorio);
-        this.archivoPagos = Path.of(directorio, archivoPagos+".csv");
-        this.cabecera = "ID,ID CLIENTE,FECHA,IMPORTE,LITROS,COMBUSTIBLE";
-        if(Files.notExists(this.archivoPagos)){
-            try{
-                Files.createFile(this.archivoPagos);
-            }catch(IOException e){
-                System.out.println(e.getMessage());
-            }
 
-//            try(BufferedWriter out = Files.newBufferedWriter(this.archivoPagos)){
-//                out.write(cabecera);
-//            }catch (IOException e){
-//                System.out.println(e.getMessage());
-//            }
-        }
+        //Se generará un archivo cuyo nombre será pasado como parámetro
+        generarCSV(directorio, archivoPagos);
     }
-
+    //=========================================================
+    //Métodos
     @Override
     protected void guardar(List<PagoRepostaje> pagos) {
+        PagoRepostajeConverter converter = new PagoRepostajeConverter();
         try(BufferedWriter out2 = Files.newBufferedWriter(archivoPagos)){
             out2.write(cabecera);
             out2.newLine();
             for(PagoRepostaje p : pagos){
-                String pagoEscritura = p.toCSV();
+                String pagoEscritura = converter.toCSV(p, ",");
                 out2.write(pagoEscritura);
                 out2.newLine();
             }
@@ -50,6 +44,7 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
 
     @Override
     protected List<PagoRepostaje> listar() {
+        PagoRepostajeConverter converter = new PagoRepostajeConverter();
         List<PagoRepostaje> pagos = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
@@ -57,8 +52,7 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
             String line = in.readLine();
             line = in.readLine();
             while(line != null){
-                PagoRepostaje pago = new PagoRepostaje();
-                pagos.add(pago.fromCSV(line));
+                pagos.add(converter.fromCSV(line, ","));
                 line = in.readLine();
 
             }
@@ -69,6 +63,21 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
         return pagos;
     }
 
+    @Override
+    protected void generarCSV(String directorio, String archivoPagos){
+        this.archivoPagos = Path.of(directorio, archivoPagos+".csv");
+        this.cabecera = "ID,ID CLIENTE,FECHA,IMPORTE,LITROS,COMBUSTIBLE";
+        if(Files.notExists(this.archivoPagos)){
+            try{
+                Files.createFile(this.archivoPagos);
+            }catch(IOException e){
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    //---------------------------------------------------------
+    //G/S
     public Path getArchivoPagos() {
         return archivoPagos;
     }
@@ -76,4 +85,5 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     public void setArchivoPagos(Path archivoPagos) {
         this.archivoPagos = archivoPagos;
     }
+    //=========================================================
 }

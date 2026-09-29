@@ -1,7 +1,7 @@
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<PagoRepostaje>{
+public class PagoRepostaje implements Comparable<PagoRepostaje>{
     //=========================================================
     //Atributos
     private int id, idCliente;
@@ -19,23 +19,20 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
         this.litros = litros;
         this.combustible = combustible;
     }
-
-    public PagoRepostaje() {
-    }
-
     //=========================================================
     //Overrides de Comparable, equals y hashcode
     @Override
     public int compareTo(PagoRepostaje o) {
-        int resultado = o.fecha.compareTo(this.fecha);
+        int resultado = o.fecha.compareTo(this.fecha);  //Orden descendente
 
-        if (resultado != 0){
+        if (resultado != 0){    //Si las fechas son iguales
             return resultado;
         }else{
-            return -(this.id-o.id);
+            return -(this.id-o.id); //Orden descendente
         }
-    }
+    } //Se establece un criterio de ordenación natural para los objetos de esta clase.
 
+    //Se hace @Override de equals y hashcode para asegurarnos de que el programa sepa en qué atributos basarse para determinar si 2 objetos de esta clase son  diferentes o no.
     @Override
     public boolean equals(Object o) {
         if(this.id == ((PagoRepostaje)o).id){
@@ -53,7 +50,7 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
         return id;
     }
 
-    //=========================================================
+    //---------------------------------------------------------
     //G/S
     public void setId(int id) {
         this.id = id;
@@ -98,31 +95,16 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>, CSVConverter<Pa
     public void setCombustible(Combustible combustible) {
         this.combustible = combustible;
     }
-
-    //=========================================================
-    //CSV
-    @Override
-    public String toCSV() {
-        return this.id+","+this.idCliente+","+this.fecha+","+this.importe+","+this.litros+","+this.combustible;
-    }
-
-    @Override
-    public PagoRepostaje fromCSV(String line) {
-        String[] splited = line.split(",");
-        return new PagoRepostaje(Integer.valueOf(splited[0]), Integer.valueOf(splited[1]), LocalDate.parse(splited[2]),
-                Double.valueOf(splited[3]), Double.valueOf(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
-    }
-
-    //=========================================================
-
-
+    //---------------------------------------------------------
+    //toString
     @Override
     public String toString() {
         return "ID: " + id +
-                ", ID del cliente: " + idCliente +
-                ", Fecha: " + fecha +
-                ", Importe: " + importe +
-                ", Litros: " + litros +
-                ", Combustible: " + combustible;
+                " | ID del cliente: " + idCliente +
+                " | Fecha: " + fecha +
+                " | Importe: " + String.format("%.2f", importe) +
+                " | Litros: " + String.format("%.2f", litros) +
+                " | Combustible: " + combustible;
     }
+    //=========================================================
 }

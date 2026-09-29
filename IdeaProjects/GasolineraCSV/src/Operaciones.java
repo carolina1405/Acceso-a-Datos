@@ -2,20 +2,30 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-
+//Esta clase almacena la lógica de cada opción que hay en el menú.
 public class Operaciones {
-    //----------------------------------------------------------------
-    public static List<Cliente> altaCliente(List<Cliente> clientes){
-        Scanner sc  = new Scanner(System.in);
+    //========================================================================================================================================
+    public static List<Cliente> altaCliente(List<Cliente> clientes, Scanner sc){
         String nombre = comprobarNombre(sc).trim(),
                 telefono = comprobarTelefono(sc).trim(),
-                matricula = comprobarMatricula(sc).trim();
+                matricula = comprobarMatricula(sc, clientes).trim();
 
-        clientes.add(new Cliente(clientes.size()+1, nombre, telefono, matricula));
-
+        boolean duplicada = false;
+        for(Cliente c : clientes){
+            if(c.getMatricula().equalsIgnoreCase(matricula)){
+                System.out.println("La matrícula ya existe para otro cliente");
+                duplicada = true;
+            }
+        }
+        if (!duplicada){
+            clientes.add(new Cliente(clientes.size()+1, nombre, telefono, matricula));
+        }else{
+            System.out.println("No se ha guardado el nuevo cliente.");
+        }
         return clientes;
     }
 
+    //COMPROBADORES
     private static String comprobarTelefono(Scanner sc){
         String telf = "";
         boolean valido = false;
@@ -43,7 +53,7 @@ public class Operaciones {
         }
         return telf;
     }
-    private static String comprobarMatricula(Scanner sc){
+    private static String comprobarMatricula(Scanner sc, List<Cliente> clientes){
         String matr = "";
         boolean valido = false;
         while(!valido){
@@ -56,7 +66,7 @@ public class Operaciones {
                 valido = true;
             }catch (IllegalArgumentException e1){
                 System.out.println("========================================");
-                System.out.println("La matrícula no puede ser un campo vacío :(");
+                System.out.println("La matrícula no puede estar vacía :(");
                 System.out.println("========================================");
             }
         }
@@ -81,7 +91,7 @@ public class Operaciones {
         }
         return name;
     }
-    //----------------------------------------------------------------
+    //========================================================================================================================================
     public static void listarClientes(List<Cliente> clientes){
         if(clientes.isEmpty()){
             System.out.println("Aún no hay clientes registrados...");
@@ -93,9 +103,8 @@ public class Operaciones {
             }
         }
     }
-    //----------------------------------------------------------------
-    public static void buscarClientes(List<Cliente> clientes){
-        Scanner sc = new Scanner(System.in);
+    //========================================================================================================================================
+    public static void buscarClientes(List<Cliente> clientes, Scanner sc){
         if(clientes.isEmpty()){
             System.out.println("Aún no hay clientes en el sistema :(");
         }else{
@@ -122,8 +131,9 @@ public class Operaciones {
             }
             System.out.println("--------------------------------");
         }
-
     }
+
+    //COMPROBADORES
     public static String comprobarClave(Scanner sc){
         String clave = "";
         boolean valido = false;
@@ -144,16 +154,15 @@ public class Operaciones {
         }
         return clave;
     }
-    //----------------------------------------------------------------
-    public static List<PagoRepostaje> procesarPagoRepostaje(List<PagoRepostaje> pagos, List<Cliente> clientes){
-        Scanner sc  = new Scanner(System.in);
+    //========================================================================================================================================
+    public static List<PagoRepostaje> procesarPagoRepostaje(List<PagoRepostaje> pagos, List<Cliente> clientes, Scanner sc){
 
         if(clientes.isEmpty()){
-            System.out.println("Aún no hay clientes registrados. Para procesar un pago debes tener al menos un cliente.");
+            System.out.println("Aún no hay clientes registrados. Para procesar un pago debes tener registrado al menos un cliente.");
         }else{
             int idCliente = comprobarFormatoIDCliente(sc);
             if(idCliente < 1 || idCliente > clientes.size()){
-                System.out.println("El cliente con id "+idCliente+" no existe.");
+                System.out.println("El cliente con id "+idCliente+" no existe. No se ha registrado el pago.");
             }else{
                 int idPago = pagos.size()+1;
                 LocalDate fecha = comprobarFormatoFecha(sc);
@@ -164,18 +173,17 @@ public class Operaciones {
                 pagos.add(new PagoRepostaje(idPago, idCliente, fecha, importe, litros, combustible));
                 System.out.println("-----------------------------------------");
                 System.out.println("Se ha guardado correctamente el pago con:" +
-                        "\nID: "+pagos.get(pagos.size()-1).getId()+
-                        "\nCliente: "+clientes.get(pagos.get(pagos.size()-1).getIdCliente()-1).getNombre()+
-                        "\nImporte: "+pagos.get(pagos.size()-1).getImporte());
+                        "\nID: "+pagos.getLast().getId()+
+                        "\nCliente: "+clientes.get(pagos.getLast().getIdCliente()-1).getNombre()+
+                        "\nImporte: "+String.format("%.2f", pagos.getLast().getImporte()));
                 System.out.println("-----------------------------------------");
 
             }
         }
-
-
         return pagos;
     }
 
+    //COMPROBADORES
     public static int comprobarFormatoIDCliente(Scanner sc){
         int id = 0;
         boolean valido = false;
@@ -212,7 +220,7 @@ public class Operaciones {
 
         while(!valido){
             try{
-                System.out.print("Escriba la fecha del pago: ");
+                System.out.print("Escriba la fecha del pago (dejar vacío para hoy): ");
                 fecha = sc.nextLine().trim();
 
                 if(!fecha.isEmpty()){
@@ -221,7 +229,8 @@ public class Operaciones {
                 valido = true;
             }catch(DateTimeParseException e2){
                 System.out.println("========================================");
-                System.out.println("El formato de la fecha debe ser: dd/MM/yyyy :(");
+                System.out.println("FOrmato no válido :(");
+                System.out.println("El formato de la fecha debe ser: dd/MM/yyyy");
                 System.out.println("========================================");
             }
         }
@@ -234,7 +243,8 @@ public class Operaciones {
         while(!valido){
             try{
                 System.out.print("Escriba el importe: ");
-                num = sc.nextDouble();
+                String line = sc.nextLine().trim();
+                num = Double.parseDouble(line.replace(",", ".")); //Esto permitirá que se puedan usar tanto comas como puntos como separador decimal.
 
                 if(num < 0){
                     throw new IllegalArgumentException("Número negativo");
@@ -252,7 +262,6 @@ public class Operaciones {
                 System.out.println("========================================");
             }
         }
-        sc.nextLine();
         return num;
     }
     public static double comprobarFormatoLitros(Scanner sc){
@@ -262,7 +271,8 @@ public class Operaciones {
         while(!valido){
             try{
                 System.out.print("Escriba los litros: ");
-                num = sc.nextDouble();
+                String line = sc.nextLine().trim();
+                num = Double.parseDouble(line.replace(",", ".")); //Esto permitirá que se puedan usar tanto comas como puntos como separador decimal.
 
                 if(num < 0){
                     throw new IllegalArgumentException("Número negativo");
@@ -280,7 +290,6 @@ public class Operaciones {
                 System.out.println("========================================");
             }
         }
-        sc.nextLine();
         return num;
     }
     public static Combustible comprobarCombustible(Scanner sc){
@@ -302,10 +311,7 @@ public class Operaciones {
         }
         return combustible;
     }
-
-
-    //----------------------------------------------------------------
-
+    //========================================================================================================================================
     public static void consultarPagos(List<PagoRepostaje> pagos){
         if(pagos.isEmpty()){
             System.out.println("Aún no se ha registrado ningún pago..." );

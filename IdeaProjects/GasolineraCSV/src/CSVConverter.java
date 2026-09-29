@@ -1,12 +1,8 @@
 public interface CSVConverter<T extends Object> {
-    //Interfaz diseñada para que cada clase pueda convertirse a formato CSV según sus características y reconvertirse en un objeto.
+    //Interfaz diseñada para que cada objeto de una clase pueda convertirse a formato CSV
+    //según sus características y reconvertirse en un objeto.
 
-    /*Tener en cuenta que esta interfaz solo sirve para que un objeto
-    se convierta en un String almacenable en un documentoCSV o para reconvertir
-    un String recuperado de un documento en un objeto de la clase correspondiente,
-    por lo que no tiene como función guardar ni sacar información de un documento.
-    Esa función la cumplirán otras clases específicamente diseñadas para ello.*/
 
-    String toCSV();
-    T fromCSV(String line);
+    public abstract String toCSV(T Objeto, String separador); //Convierte a formato CSV (un String con los atributos del objeto separados por comas ",").
+    public abstract T fromCSV(String line, String separador); //Convierte un String recuperado del documento en un objeto de la clase correspondiente.
 }
