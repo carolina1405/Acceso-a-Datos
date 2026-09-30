@@ -4,8 +4,6 @@ import java.util.Scanner;
 
 public class Menu {
     public void mostrarMenu(){
-
-        //Hay que verificar si el archivo a leer ya está creado y si no lo está crearlo.
         Scanner sc = new Scanner(System.in);
         String menuText = "=== GESTIÓN DE GASOLINERA ===\n" +
                 "1. Dar de alta un cliente\n" +
@@ -14,22 +12,23 @@ public class Menu {
                 "4. Procesar un pago de repostaje\n" +
                 "5. Consultar pagos\n" +
                 "0. Salir";
-
         byte opcion;
         //====================================================================================================================================
 
+        //Creamos 2 objetos repositorios para leer los datos en los archivos CSV y guardar los cambios al final.
+        //(en caso de que el directorio con los archivos no existiera se creará un nuevo directorio con los archivos dentro).
         RepoCliente repoCliente = new RepoCliente(".\\ArchivosCSV", "Clientes");
         RepoPagos repoPagos = new RepoPagos(".\\ArchivosCSV", "Pagos");
 
-        List<Cliente> clientes = repoCliente.listar();
-        List<PagoRepostaje> pagos = repoPagos.listar();
-        //------------------------------------------------------------------------------------------------------------------------------------
+        //Guardamos los datos en listas
+        List<Cliente> clientes = repoCliente.listarCSV();
+        List<PagoRepostaje> pagos = repoPagos.listarCSV();
+        //====================================================================================================================================
 
         //Funcionalidad tras el menú.
         do{
             System.out.println(menuText);
             opcion = comprobarOpcion(sc);
-            sc.nextLine();
             switch(opcion){
                 case 1 -> {
                     System.out.println("===================================================================");
@@ -57,19 +56,19 @@ public class Menu {
                     System.out.println("===================================================================");
                 }
                 default -> {
-                    repoCliente.guardar(clientes);
-                    repoPagos.guardar(pagos);
+                    repoCliente.guardarCSV(clientes);
+                    repoPagos.guardarCSV(pagos);
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
                     System.out.println("===================================================================");
                 }
             }
         }while(opcion != 0);
-        sc.close();  //Cerramos el Scanner
+        sc.close();  //Cerramos el escáner.
     }
 
     //-------------------------------------------------------------------------------------------------------
-    // Un método para comprobar que se escriban valores válidos para seleccionar una opción del menú.
+    // Comprueba que se escriben valores válidos para seleccionar una opción del menú.
     private byte comprobarOpcion(Scanner sc){
         byte num = 0;
         boolean valido = false;
@@ -85,14 +84,15 @@ public class Menu {
             }catch(InputMismatchException e1){
                 sc.nextLine();
                 System.out.println("===============================================================================");
-                System.out.println("Debes escribir un número entero comprendido entre 0 y 5 para elegir una opción :(");
+                System.out.println("Debes escribir un número entero y este debe ser una de las opciones del menú :(");
                 System.out.println("===============================================================================");
             }catch(IllegalArgumentException e2){
                 System.out.println("===============================================================================");
-                System.out.println("Debes escribir un número comprendido entre 0 y 5 :(");
+                System.out.println("El número introducido debe corresponderse con una de las opciones del menú :(");
                 System.out.println("===============================================================================");
             }
         }
+        sc.nextLine(); //Limpiamos el buffer del escáner.
         return num;
     }
     //-------------------------------------------------------------------------------------------------------

@@ -17,13 +17,13 @@ public class RepoCliente extends Repositorio<Cliente>{
     public RepoCliente(String directorio, String archivoClientes) {
         super(directorio);
 
-        //Se generará un archivo cuyo nombre será pasado como parámetro
+        //Se generará un archivo cuyo nombre será pasado como parámetro.
         generarCSV(directorio, archivoClientes);
     }
     //=========================================================
     //Métodos
     @Override
-    protected void guardar(List<Cliente> clientes) {
+    protected void guardarCSV(List<Cliente> clientes) {
         try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
             ClienteConverter converter = new ClienteConverter();
             out1.write(cabecera);
@@ -35,14 +35,19 @@ public class RepoCliente extends Repositorio<Cliente>{
             }
 
             System.out.println("===================================================================");
-            System.out.println("Se han guardado los cambios de los clientes.");
+            System.out.println("Se han guardado los cambios en los registros de los clientes.");
         }catch(IOException e){
-            System.out.println(e.getMessage());
+            System.out.println("========================================");
+            System.out.println("""
+                    Ha ocurrido un error.
+                    No se han guardado los cambios realizados en los
+                    registros de los clientes.""");
+            System.out.println("========================================");
         }
     }
 
     @Override
-    protected List<Cliente> listar() {
+    protected List<Cliente> listarCSV() {
         ClienteConverter converter = new ClienteConverter();
         List<Cliente> clientes = new LinkedList<>();
 
@@ -65,14 +70,17 @@ public class RepoCliente extends Repositorio<Cliente>{
     protected void generarCSV(String directorio, String archivoClientes){
         this.archivoClientes = Path.of(directorio, archivoClientes+".csv");
         this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
-        if(Files.notExists(this.archivoClientes)){
-            try{
+        try{
+            if(Files.notExists(this.archivoClientes)){
                 Files.createFile(this.archivoClientes);
-
-            }catch(IOException e){
-                System.out.println(e.getMessage());
             }
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("Ha ocurrido un error. " +
+                    "\nNo se ha creado el fichero");
+            System.out.println("========================================");
         }
+
     }
     //---------------------------------------------------------
     //G/S

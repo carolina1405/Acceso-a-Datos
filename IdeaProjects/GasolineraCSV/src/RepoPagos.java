@@ -24,7 +24,7 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     //=========================================================
     //Métodos
     @Override
-    protected void guardar(List<PagoRepostaje> pagos) {
+    protected void guardarCSV(List<PagoRepostaje> pagos) {
         PagoRepostajeConverter converter = new PagoRepostajeConverter();
         try(BufferedWriter out2 = Files.newBufferedWriter(archivoPagos)){
             out2.write(cabecera);
@@ -36,21 +36,26 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
             }
 
             System.out.println("===================================================================");
-            System.out.println("Se han guardado los cambios de los registros de pagos.");
+            System.out.println("Se han guardado los cambios en los registros de pagos.");
         }catch(IOException e){
-            System.out.println(e.getMessage());
+            System.out.println("========================================");
+            System.out.println("""
+                    Ha ocurrido un error.
+                    No se han guardado los cambios realizados en los
+                    registros de los pagos.""");
+            System.out.println("========================================");
         }
     }
 
     @Override
-    protected List<PagoRepostaje> listar() {
+    protected List<PagoRepostaje> listarCSV() {
         PagoRepostajeConverter converter = new PagoRepostajeConverter();
         List<PagoRepostaje> pagos = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
 
+            in.readLine();
             String line = in.readLine();
-            line = in.readLine();
             while(line != null){
                 pagos.add(converter.fromCSV(line, ","));
                 line = in.readLine();
@@ -67,12 +72,16 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     protected void generarCSV(String directorio, String archivoPagos){
         this.archivoPagos = Path.of(directorio, archivoPagos+".csv");
         this.cabecera = "ID,ID CLIENTE,FECHA,IMPORTE,LITROS,COMBUSTIBLE";
-        if(Files.notExists(this.archivoPagos)){
-            try{
+        try{
+            if(Files.notExists(this.archivoPagos)){
                 Files.createFile(this.archivoPagos);
-            }catch(IOException e){
-                System.out.println(e.getMessage());
             }
+
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("Ha ocurrido un error. " +
+                    "\nNo se ha creado el fichero");
+            System.out.println("========================================");
         }
     }
 

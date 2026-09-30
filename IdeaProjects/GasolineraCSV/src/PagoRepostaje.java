@@ -21,6 +21,8 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
     }
     //=========================================================
     //Overrides de Comparable, equals y hashcode
+
+    //Se establece un criterio de ordenación natural para los objetos de esta clase.
     @Override
     public int compareTo(PagoRepostaje o) {
         int resultado = o.fecha.compareTo(this.fecha);  //Orden descendente
@@ -30,7 +32,7 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
         }else{
             return -(this.id-o.id); //Orden descendente
         }
-    } //Se establece un criterio de ordenación natural para los objetos de esta clase.
+    }
 
     //Se hace @Override de equals y hashcode para asegurarnos de que el programa sepa en qué atributos basarse para determinar si 2 objetos de esta clase son  diferentes o no.
     @Override

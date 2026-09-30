@@ -17,16 +17,18 @@ public class Cliente implements Comparable<Cliente> {
 
     //=========================================================
     //Overrides de Comparable, equals y hashcode
+
+    //Se establece un criterio de ordenación natural para los objetos de esta clase.
     @Override
     public int compareTo(Cliente o) {
         int resultado =  this.nombre.compareToIgnoreCase(o.nombre); //Orden ascendente
 
-        if (resultado != 0){ //Si los nombres son iguales
+        if (resultado != 0){
             return resultado;
-        }else{
+        }else{ //Si los nombres son iguales
             return this.id-o.id; //Orden ascendente
         }
-    }  //Se establece un criterio de ordenación natural para los objetos de esta clase.
+    }
 
     //Se hace @Override de equals y hashcode para asegurarnos de que el programa sepa en qué atributos basarse para determinar si 2 objetos de esta clase son  diferentes o no.
     @Override
