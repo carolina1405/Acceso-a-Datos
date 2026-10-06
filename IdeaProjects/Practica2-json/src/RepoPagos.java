@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -87,20 +90,13 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     }
 
     //JSON
-
-    protected  void guardarJSON(List<RepoPagos> pagos){
+    @Override
+    protected void guardarJSON(List<PagoRepostaje> pagos){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try(BufferedWriter out1 = Files.newBufferedWriter(archivoPagos)){
-            ClienteConverter converter = new ClienteConverter();
-            out1.write(cabecera);
-            out1.newLine();
-            for(Cliente c: pagos){
-                String clienteEscritura = converter.toCSV(c, ",");
-                out1.write(clienteEscritura);
-                out1.newLine();
-            }
-
+            gson.toJson(pagos, out1);
             System.out.println("===================================================================");
-            System.out.println("Se han guardado los cambios en los registros de los clientes.");
+            System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
         }catch(IOException e){
             System.out.println("========================================");
             System.out.println("""
@@ -110,9 +106,33 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
             System.out.println("========================================");
         }
     }
-    protected  List<RepoPagos> listarJSON(){
 
+    @Override
+    protected  List<RepoPagos> listarJSON(){
+        List<Cliente> pagos = new LinkedList<>();
+
+
+        try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
+
+            String linea = in.readLine();
+            if(in != null){
+                linea.replace("{", "");
+                linea.replace("}", "");
+                linea.replace("[", "");
+                linea.replace("]", "");
+                String[] splitted = linea.split(":");
+
+                pagos.add(new PagoRepostaje();
+
+            }
+
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+        return pagos;
     }
+
+    @Override
     protected  void generarJSON(String directorio, String archivo){
 
     }

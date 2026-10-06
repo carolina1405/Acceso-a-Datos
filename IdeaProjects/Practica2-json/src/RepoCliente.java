@@ -91,7 +91,7 @@ public class RepoCliente extends Repositorio<Cliente>{
     }
 
     //JSON
-
+    @Override
     protected void guardarJSON(List<Cliente> clientes){
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
@@ -107,23 +107,13 @@ public class RepoCliente extends Repositorio<Cliente>{
             System.out.println("========================================");
         }
     }
-    protected  List<Cliente> listarJSON(){
-        List<Cliente> clientes = new LinkedList<>();
 
+    @Override
+    protected List<Cliente> listarJSON(){
+        List<Cliente> clientes = new LinkedList<>();
+        TypeToken<List<Cliente>> token = new                                                                                                                                                                                                                                                                             TypeToken<List<Cliente>>().getType();
 
         try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
-
-            String linea = in.readLine();
-            if(in != null){
-                linea.replace("{", "");
-                linea.replace("}", "");
-                linea.replace("[", "");
-                linea.replace("]", "");
-                String[] splitted = linea.split(":");
-                clientes.add(new Cliente(Integer.valueOf(splitted[2].trim()),
-                                splitted[4].replace("\"", "").trim(),
-                                splitted[6].replace("\"", "").trim(),
-                                splitted[8].replace("\"", "").trim()));
 
             }
 
@@ -132,6 +122,8 @@ public class RepoCliente extends Repositorio<Cliente>{
         }
         return clientes;
     }
+
+    @Override
     protected  void generarJSON(String directorio, String archivo){
         this.archivoClientes = Path.of(directorio, archivoClientes+".json");
         this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
