@@ -45,5 +45,7 @@ public abstract class Repositorio<T extends Object> {
     protected abstract void guardarJSON(List<T> lista);
     protected abstract List<T> listarJSON();
     protected abstract void generarJSON(String directorio, String archivo);
+
+
     //=========================================================
 }

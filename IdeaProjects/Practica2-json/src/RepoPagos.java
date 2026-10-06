@@ -96,8 +96,7 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
 
         try(BufferedWriter out = Files.newBufferedWriter(archivoPagos)){
             converter.gsonGenerator().toJson(pagos, out);
-            System.out.println("===================================================================");
-            System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
+            System.out.println("Pagos migrados: "+pagos.size());
         }catch(IOException e){
             System.out.println("========================================");
             System.out.println("""

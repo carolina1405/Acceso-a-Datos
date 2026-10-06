@@ -18,7 +18,7 @@ public class RepoCliente extends Repositorio<Cliente>{
         super(directorio);
 
         //Se generará un archivo cuyo nombre será pasado como parámetro.
-        generarCSV(directorio, archivoClientes);
+        generarJSON(directorio, archivoClientes);
     }
     //=========================================================
     //Métodos
@@ -92,8 +92,8 @@ public class RepoCliente extends Repositorio<Cliente>{
         try(BufferedWriter out = Files.newBufferedWriter(archivoClientes)){
             converter.gsonGenerator().toJson(clientes, out);  //Esta línea es la que guarda nuestra lista en JSON
 
-            System.out.println("===================================================================");
-            System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
+
+            System.out.println("Clientes migrados: "+clientes.size());
         }catch(IOException e){
             System.out.println("========================================");
             System.out.println("""
