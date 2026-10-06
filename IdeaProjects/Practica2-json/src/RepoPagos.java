@@ -111,12 +111,21 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
 
     @Override
     protected List<PagoRepostaje> listarJSON() {
-        List<PagoRepostaje> pagos = new LinkedList<>();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type token = new TypeToken<LinkedList<PagoRepostaje>>().getType();
+        Type token = new TypeToken<LinkedList<PagoRepostaje>>(){}.getType();
+        List<PagoRepostaje> pagos = new LinkedList<>();
 
+        try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
 
+            pagos = gson.fromJson(in, token);
 
+            if(pagos == null){
+                pagos = new LinkedList<>();
+            }
+
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
         return pagos;
     }
 

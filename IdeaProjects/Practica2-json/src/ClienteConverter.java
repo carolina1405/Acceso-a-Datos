@@ -27,6 +27,20 @@ public class ClienteConverter implements CSVConverter<Cliente>, JSONConverter<Cl
     @Override
     public Cliente fromJSON(String line) {
         line = line.replace("{", "");
-        line = line.replace("\"clientes\":")
+        line = line.replace("}", "");
+        line = line.replace("\"clientes\": ", "");
+        line = line.replace("[", "");
+        line = line.replace("]", "");
+        line = line.replace("]", "");
+        line = line.replace("\"", "");
+        line = line.replace(":", "");
+        line = line.replace("id", "");
+        line = line.replace("nombre", "");
+        line = line.replace("telefono", "");
+        line = line.replace("matricula", "");
+        line = line.replace("\\s+", "");
+        String[] splited = line.split(",");
+        return new Cliente(Integer.valueOf(splited[0]), splited[1], splited[2], splited[3]);
+
     }
 }

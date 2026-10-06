@@ -109,12 +109,17 @@ public class RepoCliente extends Repositorio<Cliente>{
 
     @Override
     protected List<Cliente> listarJSON(){
-        List<Cliente> clientes = new LinkedList<>();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type token = new TypeToken<LinkedList<Cliente>>().getType();
+        Type token = new TypeToken<LinkedList<Cliente>>(){}.getType();
+        List<Cliente> clientes = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
+
             clientes = gson.fromJson(in, token);
+
+            if(clientes == null){
+                clientes = new LinkedList<>();
+            }
 
         }catch (IOException e){
             System.out.println(e.getMessage());

@@ -30,6 +30,25 @@ public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>, JSON
     @Override
     public PagoRepostaje fromJSON(String line) {
 
-        return null;
+        line = line.replace("{", "");
+        line = line.replace("}", "");
+        line = line.replace("\"clientes\": ", "");
+        line = line.replace("[", "");
+        line = line.replace("]", "");
+        line = line.replace("]", "");
+        line = line.replace("\"", "");
+        line = line.replace(":", "");
+        line = line.replace("id", "");
+        line = line.replace("id", "");
+        line = line.replace("clienteId", "");
+        line = line.replace("fecha", "");
+        line = line.replace("importe", "");
+        line = line.replace("litros", "");
+        line = line.replace("combustible", "");
+        line = line.replace("\\s+", "");
+        String[] splited = line.split(",");
+
+        return new PagoRepostaje(Integer.parseInt(splited[0]), Integer.parseInt(splited[1]), LocalDate.parse(splited[2]),
+                Double.parseDouble(splited[3]), Double.parseDouble(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
     }
 }
