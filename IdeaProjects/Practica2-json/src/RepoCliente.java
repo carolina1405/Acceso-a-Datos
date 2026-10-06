@@ -1,6 +1,12 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -82,6 +88,63 @@ public class RepoCliente extends Repositorio<Cliente>{
             System.out.println("========================================");
         }
 
+    }
+
+    //JSON
+
+    protected void guardarJSON(List<Cliente> clientes){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
+            gson.toJson(clientes, out1);
+            System.out.println("===================================================================");
+            System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("""
+                    Ha ocurrido un error.
+                    No se han guardado los cambios realizados en los
+                    registros de los clientes.""");
+            System.out.println("========================================");
+        }
+    }
+    protected  List<Cliente> listarJSON(){
+        List<Cliente> clientes = new LinkedList<>();
+
+
+        try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
+
+            String linea = in.readLine();
+            if(in != null){
+                linea.replace("{", "");
+                linea.replace("}", "");
+                linea.replace("[", "");
+                linea.replace("]", "");
+                String[] splitted = linea.split(":");
+                clientes.add(new Cliente(Integer.valueOf(splitted[2].trim()),
+                                splitted[4].replace("\"", "").trim(),
+                                splitted[6].replace("\"", "").trim(),
+                                splitted[8].replace("\"", "").trim()));
+
+            }
+
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+        return clientes;
+    }
+    protected  void generarJSON(String directorio, String archivo){
+        this.archivoClientes = Path.of(directorio, archivoClientes+".json");
+        this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
+        try{
+            if(Files.notExists(this.archivoClientes)){
+                Files.createFile(this.archivoClientes);
+            }
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("Ha ocurrido un error. " +
+                    "\nNo se ha creado el fichero");
+            System.out.println("========================================");
+        }
     }
 
     //---------------------------------------------------------

@@ -23,6 +23,7 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     }
     //=========================================================
     //Métodos
+    //CSV
     @Override
     protected void guardarCSV(List<PagoRepostaje> pagos) {
         PagoRepostajeConverter converter = new PagoRepostajeConverter();
@@ -83,6 +84,37 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
                     "\nNo se ha creado el fichero");
             System.out.println("========================================");
         }
+    }
+
+    //JSON
+
+    protected  void guardarJSON(List<RepoPagos> pagos){
+        try(BufferedWriter out1 = Files.newBufferedWriter(archivoPagos)){
+            ClienteConverter converter = new ClienteConverter();
+            out1.write(cabecera);
+            out1.newLine();
+            for(Cliente c: pagos){
+                String clienteEscritura = converter.toCSV(c, ",");
+                out1.write(clienteEscritura);
+                out1.newLine();
+            }
+
+            System.out.println("===================================================================");
+            System.out.println("Se han guardado los cambios en los registros de los clientes.");
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("""
+                    Ha ocurrido un error.
+                    No se han guardado los cambios realizados en los
+                    registros de los clientes.""");
+            System.out.println("========================================");
+        }
+    }
+    protected  List<RepoPagos> listarJSON(){
+
+    }
+    protected  void generarJSON(String directorio, String archivo){
+
     }
 
     //---------------------------------------------------------

@@ -15,14 +15,27 @@ public class Menu {
         byte opcion;
         //====================================================================================================================================
 
-        //Creamos 2 objetos repositorios para leer los datos en los archivos CSV y guardar los cambios al final.
-        //(en caso de que el directorio con los archivos no existiera se creará un nuevo directorio con los archivos dentro).
-        RepoCliente repoCliente = new RepoCliente(".\\ArchivosCSV", "Clientes");
-        RepoPagos repoPagos = new RepoPagos(".\\ArchivosCSV", "Pagos");
+
+        RepoCliente repoClientes = new RepoCliente(".\\ArchivosJSON", "Clientes");
+        RepoPagos repoPagos = new RepoPagos(".\\ArchivosJSON", "Pagos");
+
+
+        System.out.println();
+
+        String migrar = comprobarMigracion(sc);
+
+        if(migrar.equalsIgnoreCase("S")){
+            System.out.print("Escriba el nombre del directorio donde guarda los archivos CSV: ");
+            String directorio = sc.nextLine();
+            migrarDatosCSV(directorio);
+        }else{
+            System.out.println("Has decidido no migrar los datos.");
+        }
+
 
         //Guardamos los datos en listas
-        List<Cliente> clientes = repoCliente.listarCSV();
-        List<PagoRepostaje> pagos = repoPagos.listarCSV();
+        List<Cliente> clientes = repoClientes.listarJSON();
+        List<PagoRepostaje> pagos = repoPagos.listarJSON();
         //====================================================================================================================================
 
         //Funcionalidad tras el menú.
@@ -56,13 +69,12 @@ public class Menu {
                     System.out.println("===================================================================");
                 }
                 default -> {
-                    repoCliente.guardarCSV(clientes);
-                    repoPagos.guardarCSV(pagos);
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
                     System.out.println("===================================================================");
                 }
             }
+
         }while(opcion != 0);
         sc.close();  //Cerramos el escáner.
     }
@@ -96,4 +108,26 @@ public class Menu {
         return num;
     }
     //-------------------------------------------------------------------------------------------------------
+    private void migrarDatosCSV(String directorio){
+
+    }
+    private String comprobarMigracion(Scanner sc){
+        String opcion = "";
+        boolean valido = false;
+        while(!valido){
+            try{
+                System.out.print("¿Desea migrar los datos de archivos en CSV creados previamente a JSON?: ");
+                opcion = sc.nextLine();
+                if(!opcion.equalsIgnoreCase("S") && !opcion.equalsIgnoreCase("N")){
+                    throw new IllegalArgumentException("Respuesta no válida");
+                }
+                valido = true;
+            }catch (IllegalArgumentException e){
+                System.out.println("===============================================================================");
+                System.out.println("Debes elegir S/N");
+                System.out.println("===============================================================================");
+            }
+        }
+        return opcion;
+    }
 }

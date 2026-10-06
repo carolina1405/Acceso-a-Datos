@@ -31,14 +31,19 @@ public abstract class Repositorio<T extends Object> {
     //=========================================================
     /*Métodos que podrán implementar las clases hijas en función del objeto para el
       cual esté dedicado el repositorio.*/
+    //CSV
     protected abstract void guardarCSV(List<T> lista);
     protected abstract List<T> listarCSV();
-
-
     /*Este método generará el archivo CSV preparado para utilizarlo.
       Repositorio tendrá un método para el tipo de archivo que desee generar con sus especificaciones en cada caso,
       por ejemplo un CSV tiene una extensión .csv y en este caso tendrá una cabecera.
       Si necesitamos crear otro tipo de archivo que no esté especificado (e incluso utilizar una base de datos) solo tendremos que crear el método correspondiente e implementarlo en el constructor de Repositorio.*/
-      protected abstract void generarCSV(String directorio, String archivo);
+    protected abstract void generarCSV(String directorio, String archivo);
+
+
+    //JSON
+    protected abstract void guardarJSON(List<T> lista);
+    protected abstract List<T> listarJSON();
+    protected abstract void generarJSON(String directorio, String archivo);
     //=========================================================
 }
