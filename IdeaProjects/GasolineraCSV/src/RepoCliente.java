@@ -22,6 +22,7 @@ public class RepoCliente extends Repositorio<Cliente>{
     }
     //=========================================================
     //Métodos
+    //CSV
     @Override
     protected void guardarCSV(List<Cliente> clientes) {
         try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
@@ -82,6 +83,7 @@ public class RepoCliente extends Repositorio<Cliente>{
         }
 
     }
+
     //---------------------------------------------------------
     //G/S
     public Path getArchivoClientes() {
