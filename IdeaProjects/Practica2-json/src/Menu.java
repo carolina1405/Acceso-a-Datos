@@ -1,4 +1,3 @@
-import java.io.BufferedReader;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -16,19 +15,18 @@ public class Menu {
         byte opcion;
         //====================================================================================================================================
 
-
+        //Al iniciar el programa se generan los ficheros JSON en caso de no existir previamente en el directorio.
         RepoCliente repoClientes = new RepoCliente(".\\ArchivosJSON", "Clientes");
         RepoPagos repoPagos = new RepoPagos(".\\ArchivosJSON", "Pagos");
 
 
-        System.out.println();
 
-        String migrar = comprobarMigracion(sc);
+        String migrar = comprobarOpcionMigracion(sc);
 
         if(migrar.equalsIgnoreCase("S")){
             System.out.print("Escriba el nombre del directorio donde guarda los archivos CSV: ");
             String directorio = sc.nextLine();
-            migrarDatosCSV(directorio, repoClientes, repoPagos);
+
         }else{
             System.out.println("Has decidido no migrar los datos.");
         }
@@ -110,24 +108,12 @@ public class Menu {
         return num;
     }
     //-------------------------------------------------------------------------------------------------------
-    private void migrarDatosCSV(String directorio, RepoCliente repoClienteJSON,  RepoPagos repoPagosJSON){
-        RepoCliente repoClientesCSV = new RepoCliente(directorio, "Clientes");
-        RepoPagos repoPagosCSV = new RepoPagos(directorio, "Pagos");
-
-        List<Cliente> clientes = repoClientesCSV.listarCSV();
-        List<PagoRepostaje> pagos = repoPagosCSV.listarCSV();
-
-        repoClienteJSON.guardarJSON(clientes);
-        repoPagosCSV.guardarJSON(pagos);
-
-        System.out.println("Se han migrado los datos.");
-    }
-    private String comprobarMigracion(Scanner sc){
+    private String comprobarOpcionMigracion(Scanner sc){
         String opcion = "";
         boolean valido = false;
         while(!valido){
             try{
-                System.out.print("¿Desea migrar los datos de archivos en CSV creados previamente a JSON?: ");
+                System.out.print("¿Desea migrar los datos de archivos en CSV creados previamente a JSON (S/N)?: ");
                 opcion = sc.nextLine();
                 if(!opcion.equalsIgnoreCase("S") && !opcion.equalsIgnoreCase("N")){
                     throw new IllegalArgumentException("Respuesta no válida");

@@ -1,8 +1,14 @@
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.util.LinkedList;
 
-public class ClienteConverter implements CSVConverter<Cliente>, JSONConverter<Cliente>{
+
+public class ClienteConverter implements CSVConverter<Cliente>, JSONConverter{
     //Clase encargada de cambiar el formato de un objeto de la clase Cliente o convertir otro objeto en uno de dicha clase.
 
+    //CSV
     @Override
     public String toCSV(Cliente cliente, String separador) {
         return cliente.getID()+separador+cliente.getNombre()+separador+cliente.getTelefono()+separador+cliente.getMatricula();
@@ -14,33 +20,14 @@ public class ClienteConverter implements CSVConverter<Cliente>, JSONConverter<Cl
         return new Cliente(Integer.parseInt(splited[0]), splited[1], splited[2], splited[3]);
     }
 
+    //JSON
     @Override
-    public String toJSON(Cliente object) {
-        String line = "{\"id\": "+object.getID()+"," +
-                "\"nombre\": \""+object.getNombre()+"\"," +
-                "\"telefono\": \""+object.getTelefono()+"\"," +
-                "\"matricula\": \""+object.getMatricula()+"\"}";
-
-        return line;
+    public Gson gsonGenerator() {
+        return new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override
-    public Cliente fromJSON(String line) {
-        line = line.replace("{", "");
-        line = line.replace("}", "");
-        line = line.replace("\"clientes\": ", "");
-        line = line.replace("[", "");
-        line = line.replace("]", "");
-        line = line.replace("]", "");
-        line = line.replace("\"", "");
-        line = line.replace(":", "");
-        line = line.replace("id", "");
-        line = line.replace("nombre", "");
-        line = line.replace("telefono", "");
-        line = line.replace("matricula", "");
-        line = line.replace("\\s+", "");
-        String[] splited = line.split(",");
-        return new Cliente(Integer.valueOf(splited[0]), splited[1], splited[2], splited[3]);
-
+    public Type tokenGenerator() {
+        return new TypeToken<LinkedList<Cliente>>(){}.getType();
     }
 }

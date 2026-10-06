@@ -1,11 +1,6 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -30,14 +25,14 @@ public class RepoCliente extends Repositorio<Cliente>{
     //CSV
     @Override
     protected void guardarCSV(List<Cliente> clientes) {
-        try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
+        try(BufferedWriter out = Files.newBufferedWriter(archivoClientes)){
             ClienteConverter converter = new ClienteConverter();
-            out1.write(cabecera);
-            out1.newLine();
+            out.write(cabecera);
+            out.newLine();
             for(Cliente c: clientes){
                 String clienteEscritura = converter.toCSV(c, ",");
-                out1.write(clienteEscritura);
-                out1.newLine();
+                out.write(clienteEscritura);
+                out.newLine();
             }
 
             System.out.println("===================================================================");
@@ -92,9 +87,11 @@ public class RepoCliente extends Repositorio<Cliente>{
     //JSON
     @Override
     protected void guardarJSON(List<Cliente> clientes){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try(BufferedWriter out1 = Files.newBufferedWriter(archivoClientes)){
-            gson.toJson(clientes, out1);
+        ClienteConverter converter = new ClienteConverter();
+
+        try(BufferedWriter out = Files.newBufferedWriter(archivoClientes)){
+            converter.gsonGenerator().toJson(clientes, out);  //Esta línea es la que guarda nuestra lista en JSON
+
             System.out.println("===================================================================");
             System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
         }catch(IOException e){
@@ -109,17 +106,14 @@ public class RepoCliente extends Repositorio<Cliente>{
 
     @Override
     protected List<Cliente> listarJSON(){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type token = new TypeToken<LinkedList<Cliente>>(){}.getType();
+        ClienteConverter converter = new ClienteConverter();
         List<Cliente> clientes = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
 
-            clientes = gson.fromJson(in, token);
+            converter.gsonGenerator().fromJson(in, converter.tokenGenerator());
 
-            if(clientes == null){
-                clientes = new LinkedList<>();
-            }
+            if(clientes == null) clientes = new LinkedList<>();
 
         }catch (IOException e){
             System.out.println(e.getMessage());
@@ -130,7 +124,6 @@ public class RepoCliente extends Repositorio<Cliente>{
     @Override
     protected  void generarJSON(String directorio, String archivo){
         this.archivoClientes = Path.of(directorio, archivoClientes+".json");
-        this.cabecera = "{\"pagos\": [";
         try{
             if(Files.notExists(this.archivoClientes)){
                 Files.createFile(this.archivoClientes);

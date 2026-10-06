@@ -1,7 +1,15 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.util.LinkedList;
 
-public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>, JSONConverter<PagoRepostaje>{
+
+public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>, JSONConverter{
     //Clase encargada de cambiar el formato de un objeto de la clase PagoRepostaje o convertir otro objeto en uno de dicha clase.
+
+    //CSV
 
     @Override
     public String toCSV(PagoRepostaje pago, String separador) {
@@ -15,40 +23,15 @@ public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>, JSON
                 Double.parseDouble(splited[3]), Double.parseDouble(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
     }
 
-    @Override
-    public String toJSON(PagoRepostaje object) {
-        String line = "{\"id\": "+object.getId()+"," +
-                        "\"clienteId\": "+object.getIdCliente()+"," +
-                        "\"fecha\": \""+object.getFecha()+"\"," +
-                        "\"importe\": "+object.getImporte()+","+
-                        "\"litros\": "+object.getLitros()+","+
-                        "\"combustible\": \""+object.getCombustible()+"\"}";
+    //JSON
 
-        return line;
+    @Override
+    public Gson gsonGenerator() {
+        return new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override
-    public PagoRepostaje fromJSON(String line) {
-
-        line = line.replace("{", "");
-        line = line.replace("}", "");
-        line = line.replace("\"clientes\": ", "");
-        line = line.replace("[", "");
-        line = line.replace("]", "");
-        line = line.replace("]", "");
-        line = line.replace("\"", "");
-        line = line.replace(":", "");
-        line = line.replace("id", "");
-        line = line.replace("id", "");
-        line = line.replace("clienteId", "");
-        line = line.replace("fecha", "");
-        line = line.replace("importe", "");
-        line = line.replace("litros", "");
-        line = line.replace("combustible", "");
-        line = line.replace("\\s+", "");
-        String[] splited = line.split(",");
-
-        return new PagoRepostaje(Integer.parseInt(splited[0]), Integer.parseInt(splited[1]), LocalDate.parse(splited[2]),
-                Double.parseDouble(splited[3]), Double.parseDouble(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
+    public Type tokenGenerator() {
+        return new TypeToken<LinkedList<PagoRepostaje>>(){}.getType();
     }
 }

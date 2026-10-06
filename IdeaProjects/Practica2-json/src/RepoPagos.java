@@ -1,11 +1,6 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -32,13 +27,13 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     @Override
     protected void guardarCSV(List<PagoRepostaje> pagos) {
         PagoRepostajeConverter converter = new PagoRepostajeConverter();
-        try(BufferedWriter out2 = Files.newBufferedWriter(archivoPagos)){
-            out2.write(cabecera);
-            out2.newLine();
+        try(BufferedWriter out = Files.newBufferedWriter(archivoPagos)){
+            out.write(cabecera);
+            out.newLine();
             for(PagoRepostaje p : pagos){
                 String pagoEscritura = converter.toCSV(p, ",");
-                out2.write(pagoEscritura);
-                out2.newLine();
+                out.write(pagoEscritura);
+                out.newLine();
             }
 
             System.out.println("===================================================================");
@@ -91,12 +86,16 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
         }
     }
 
+
+
+
     //JSON
     @Override
     protected void guardarJSON(List<PagoRepostaje> pagos){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try(BufferedWriter out1 = Files.newBufferedWriter(archivoPagos)){
-            gson.toJson(pagos, out1);
+        PagoRepostajeConverter converter = new PagoRepostajeConverter();  //Esta línea es la que guarda nuestra lista en JSON
+
+        try(BufferedWriter out = Files.newBufferedWriter(archivoPagos)){
+            converter.gsonGenerator().toJson(pagos, out);
             System.out.println("===================================================================");
             System.out.println("Se han guardado los cambios en los registros de los clientes en JSON.");
         }catch(IOException e){
@@ -111,17 +110,14 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
 
     @Override
     protected List<PagoRepostaje> listarJSON() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Type token = new TypeToken<LinkedList<PagoRepostaje>>(){}.getType();
+        PagoRepostajeConverter converter = new PagoRepostajeConverter();
         List<PagoRepostaje> pagos = new LinkedList<>();
 
         try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
 
-            pagos = gson.fromJson(in, token);
+            converter.gsonGenerator().fromJson(in, converter.tokenGenerator());
 
-            if(pagos == null){
-                pagos = new LinkedList<>();
-            }
+            if(pagos == null) pagos = new LinkedList<>();
 
         }catch (IOException e){
             System.out.println(e.getMessage());
@@ -133,7 +129,6 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     @Override
     protected  void generarJSON(String directorio, String archivo){
         this.archivoPagos = Path.of(directorio, archivoPagos+".json");
-        this.cabecera = "{\"pagos\": [";
         try{
             if(Files.notExists(this.archivoPagos)){
                 Files.createFile(this.archivoPagos);
