@@ -1,6 +1,6 @@
 import java.time.LocalDate;
 
-public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>{
+public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>, JSONConverter<PagoRepostaje>{
     //Clase encargada de cambiar el formato de un objeto de la clase PagoRepostaje o convertir otro objeto en uno de dicha clase.
 
     @Override
@@ -13,5 +13,23 @@ public class PagoRepostajeConverter implements CSVConverter<PagoRepostaje>{
         String[] splited = line.split(separador);
         return new PagoRepostaje(Integer.parseInt(splited[0]), Integer.parseInt(splited[1]), LocalDate.parse(splited[2]),
                 Double.parseDouble(splited[3]), Double.parseDouble(splited[4]), Combustible.valueOf(splited[5].toUpperCase()));
+    }
+
+    @Override
+    public String toJSON(PagoRepostaje object) {
+        String line = "{\"id\": "+object.getId()+"," +
+                        "\"clienteId\": "+object.getIdCliente()+"," +
+                        "\"fecha\": \""+object.getFecha()+"\"," +
+                        "\"importe\": "+object.getImporte()+","+
+                        "\"litros\": "+object.getLitros()+","+
+                        "\"combustible\": \""+object.getCombustible()+"\"}";
+
+        return line;
+    }
+
+    @Override
+    public PagoRepostaje fromJSON(String line) {
+
+        return null;
     }
 }

@@ -1,9 +1,11 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -108,33 +110,31 @@ public class RepoPagos extends Repositorio<PagoRepostaje>{
     }
 
     @Override
-    protected  List<RepoPagos> listarJSON(){
-        List<Cliente> pagos = new LinkedList<>();
+    protected List<PagoRepostaje> listarJSON() {
+        List<PagoRepostaje> pagos = new LinkedList<>();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Type token = new TypeToken<LinkedList<PagoRepostaje>>().getType();
 
 
-        try(BufferedReader in = Files.newBufferedReader(archivoPagos)){
 
-            String linea = in.readLine();
-            if(in != null){
-                linea.replace("{", "");
-                linea.replace("}", "");
-                linea.replace("[", "");
-                linea.replace("]", "");
-                String[] splitted = linea.split(":");
-
-                pagos.add(new PagoRepostaje();
-
-            }
-
-        }catch (IOException e){
-            System.out.println(e.getMessage());
-        }
         return pagos;
     }
 
+
     @Override
     protected  void generarJSON(String directorio, String archivo){
-
+        this.archivoPagos = Path.of(directorio, archivoPagos+".json");
+        this.cabecera = "{\"pagos\": [";
+        try{
+            if(Files.notExists(this.archivoPagos)){
+                Files.createFile(this.archivoPagos);
+            }
+        }catch(IOException e){
+            System.out.println("========================================");
+            System.out.println("Ha ocurrido un error. " +
+                    "\nNo se ha creado el fichero");
+            System.out.println("========================================");
+        }
     }
 
     //---------------------------------------------------------

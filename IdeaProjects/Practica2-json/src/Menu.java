@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -27,7 +28,7 @@ public class Menu {
         if(migrar.equalsIgnoreCase("S")){
             System.out.print("Escriba el nombre del directorio donde guarda los archivos CSV: ");
             String directorio = sc.nextLine();
-            migrarDatosCSV(directorio);
+            migrarDatosCSV(directorio, repoClientes, repoPagos);
         }else{
             System.out.println("Has decidido no migrar los datos.");
         }
@@ -74,7 +75,8 @@ public class Menu {
                     System.out.println("===================================================================");
                 }
             }
-
+            repoClientes.guardarJSON(clientes);
+            repoPagos.guardarJSON(pagos);
         }while(opcion != 0);
         sc.close();  //Cerramos el escáner.
     }
@@ -108,8 +110,17 @@ public class Menu {
         return num;
     }
     //-------------------------------------------------------------------------------------------------------
-    private void migrarDatosCSV(String directorio){
+    private void migrarDatosCSV(String directorio, RepoCliente repoClienteJSON,  RepoPagos repoPagosJSON){
+        RepoCliente repoClientesCSV = new RepoCliente(directorio, "Clientes");
+        RepoPagos repoPagosCSV = new RepoPagos(directorio, "Pagos");
 
+        List<Cliente> clientes = repoClientesCSV.listarCSV();
+        List<PagoRepostaje> pagos = repoPagosCSV.listarCSV();
+
+        repoClienteJSON.guardarJSON(clientes);
+        repoPagosCSV.guardarJSON(pagos);
+
+        System.out.println("Se han migrado los datos.");
     }
     private String comprobarMigracion(Scanner sc){
         String opcion = "";

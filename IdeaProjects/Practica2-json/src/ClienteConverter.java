@@ -1,4 +1,6 @@
-public class ClienteConverter implements CSVConverter<Cliente>{
+import java.util.List;
+
+public class ClienteConverter implements CSVConverter<Cliente>, JSONConverter<Cliente>{
     //Clase encargada de cambiar el formato de un objeto de la clase Cliente o convertir otro objeto en uno de dicha clase.
 
     @Override
@@ -12,4 +14,19 @@ public class ClienteConverter implements CSVConverter<Cliente>{
         return new Cliente(Integer.parseInt(splited[0]), splited[1], splited[2], splited[3]);
     }
 
+    @Override
+    public String toJSON(Cliente object) {
+        String line = "{\"id\": "+object.getID()+"," +
+                "\"nombre\": \""+object.getNombre()+"\"," +
+                "\"telefono\": \""+object.getTelefono()+"\"," +
+                "\"matricula\": \""+object.getMatricula()+"\"}";
+
+        return line;
+    }
+
+    @Override
+    public Cliente fromJSON(String line) {
+        line = line.replace("{", "");
+        line = line.replace("\"clientes\":")
+    }
 }

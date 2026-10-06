@@ -2,7 +2,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -111,11 +110,11 @@ public class RepoCliente extends Repositorio<Cliente>{
     @Override
     protected List<Cliente> listarJSON(){
         List<Cliente> clientes = new LinkedList<>();
-        TypeToken<List<Cliente>> token = new                                                                                                                                                                                                                                                                             TypeToken<List<Cliente>>().getType();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Type token = new TypeToken<LinkedList<Cliente>>().getType();
 
         try(BufferedReader in = Files.newBufferedReader(archivoClientes)){
-
-            }
+            clientes = gson.fromJson(in, token);
 
         }catch (IOException e){
             System.out.println(e.getMessage());
@@ -126,7 +125,7 @@ public class RepoCliente extends Repositorio<Cliente>{
     @Override
     protected  void generarJSON(String directorio, String archivo){
         this.archivoClientes = Path.of(directorio, archivoClientes+".json");
-        this.cabecera = "ID,NOMBRE,TELÉFONO,MATRÍCULA";
+        this.cabecera = "{\"pagos\": [";
         try{
             if(Files.notExists(this.archivoClientes)){
                 Files.createFile(this.archivoClientes);
