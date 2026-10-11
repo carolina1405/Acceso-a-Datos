@@ -105,8 +105,8 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
         return id +
                 "\t" + idCliente +
                 "\t" + fecha +
-                "\t" + String.format("%.2f", importe) +
-                "\t" + String.format("%.2f", litros) +
+                "\t" + String.format("%.2f €", importe) +
+                "\t" + String.format("%.2f L", litros) +
                 "\t" + combustible;
     }
     //=========================================================

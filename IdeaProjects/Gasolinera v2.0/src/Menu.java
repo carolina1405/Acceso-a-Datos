@@ -17,8 +17,12 @@ public class Menu {
         byte opcion;
 
         Almacenamiento almacenamientoCSV = new AlmacenamientoCSV();
-        List<Cliente> clientes = almacenamientoCSV.leerClientes();
-        List<PagoRepostaje> pagos = almacenamientoCSV.leerPagos();
+
+        List<Cliente> lecturaClientes = almacenamientoCSV.leerClientes();
+        List<Cliente> clientes = new LinkedList<>(lecturaClientes);
+
+        List<PagoRepostaje> lecturaPagos = almacenamientoCSV.leerPagos();
+        List<PagoRepostaje> pagos = new LinkedList<>(lecturaPagos);
 
         do {
             System.out.println(menuText);
@@ -41,7 +45,7 @@ public class Menu {
                 }
                 case 4 -> {
                     System.out.println("===================================================================");
-                    OperacionesMenu.procesarPagoRepostaje(pagos, clientes, sc);
+                    pagos = OperacionesMenu.procesarPagoRepostaje(pagos, clientes, sc);
                     System.out.println("===================================================================");
                 }
                 case 5 -> {
@@ -70,14 +74,13 @@ public class Menu {
         while(!valido){
             try{
                 System.out.print("Opción: ");
-                num = sc.nextByte();
+                num = Byte.parseByte(sc.nextLine());
                 if(num > 5 || num < 0){
                     throw new IllegalArgumentException ("Fuera de rango.");
                 }
 
                 valido = true;
-            }catch(InputMismatchException e1){
-                sc.nextLine();
+            }catch(NumberFormatException e1){
                 System.out.println("===============================================================================");
                 System.out.println("Debes escribir un número entero y este debe ser una de las opciones del menú :(");
                 System.out.println("===============================================================================");
@@ -87,7 +90,6 @@ public class Menu {
                 System.out.println("===============================================================================");
             }
         }
-        sc.nextLine(); //Limpiamos el buffer del escáner.
         return num;
     }
 }
