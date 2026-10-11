@@ -16,14 +16,18 @@ public class Menu {
                 "0. Salir";
         byte opcion;
 
+        //
         Almacenamiento almacenamientoCSV = new AlmacenamientoCSV();
 
+        //Como los streams usados para la lectura devuelven listas inmutables,
+        //debo reasignar sus valores en nuevas listas que sí puedan ser modificadas.
         List<Cliente> lecturaClientes = almacenamientoCSV.leerClientes();
         List<Cliente> clientes = new LinkedList<>(lecturaClientes);
 
         List<PagoRepostaje> lecturaPagos = almacenamientoCSV.leerPagos();
         List<PagoRepostaje> pagos = new LinkedList<>(lecturaPagos);
 
+        //Esta es la lógica detrás del menú.
         do {
             System.out.println(menuText);
             opcion = comprobarOpcion(sc);
@@ -54,6 +58,7 @@ public class Menu {
                     System.out.println("===================================================================");
                 }
                 default -> {
+                    //Guardamos los cambios antes de cerrar el programa.
                     almacenamientoCSV.escribirClientes(clientes);
                     almacenamientoCSV.escribirPagos(pagos);
 
@@ -65,7 +70,7 @@ public class Menu {
             }
 
         }while (opcion != 0) ;
-        sc.close();  //Cerramos el escáner.
+        sc.close();  //Cerramos el escáner al final del programa.
     }
 
     private byte comprobarOpcion(Scanner sc){
