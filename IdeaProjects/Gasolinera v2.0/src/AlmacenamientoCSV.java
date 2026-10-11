@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class AlmacenamientoCSV implements Almacenamiento{
-    /*Clase que implementa la interfaz de Almacenamiento para CSV para clientes y pagos*/
+    /*Clase que implementa la interfaz de Almacenamiento
+    para CSV para clientes y pagos*/
+
+    //ATRIBUTOS
     Path directorio;
     Path archivoClientes;
     Path archivoPagos;
     String encabezado;
 
+    //COSNTRUCTOR
     public AlmacenamientoCSV(){
         this.directorio = Path.of("ArchivosCSV");
         this.archivoClientes = directorio.resolve("clientes.csv");
@@ -32,6 +36,7 @@ public class AlmacenamientoCSV implements Almacenamiento{
         }
     }
 
+    //MÉTODOS
     @Override
     public List<Cliente> leerClientes() {
         List<Cliente> clientes = new LinkedList<>();

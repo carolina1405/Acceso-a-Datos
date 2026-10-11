@@ -15,15 +15,15 @@ public class Menu {
                 "0. Salir";
         byte opcion;
 
-        //
-        Almacenamiento almacenamientoCSV = new AlmacenamientoCSV();
+        //Creamos un almacenamiento para leer/escribir en el formato deseado.
+        Almacenamiento almacenamientoJSON = new AlmacenamientoJSON();
 
         //Como los streams usados para la lectura devuelven listas inmutables,
         //debo reasignar sus valores en nuevas listas que sí puedan ser modificadas.
-        List<Cliente> lecturaClientes = almacenamientoCSV.leerClientes();
+        List<Cliente> lecturaClientes = almacenamientoJSON.leerClientes();
         List<Cliente> clientes = new LinkedList<>(lecturaClientes);
 
-        List<PagoRepostaje> lecturaPagos = almacenamientoCSV.leerPagos();
+        List<PagoRepostaje> lecturaPagos = almacenamientoJSON.leerPagos();
         List<PagoRepostaje> pagos = new LinkedList<>(lecturaPagos);
 
         //Esta es la lógica detrás del menú.
@@ -35,32 +35,38 @@ public class Menu {
                     System.out.println("===================================================================");
                     clientes = OperacionesMenu.altaCliente(clientes, sc);
                     System.out.println("===================================================================");
+                    almacenamientoJSON.escribirClientes(clientes); //Ahora guardamos los cambios tras cada operación
+                    almacenamientoJSON.escribirPagos(pagos);
                 }
                 case 2 -> {
                     System.out.println("===================================================================");
                     OperacionesMenu.listarClientes(clientes);
                     System.out.println("===================================================================");
+                    almacenamientoJSON.escribirClientes(clientes);
+                    almacenamientoJSON.escribirPagos(pagos);
                 }
                 case 3 -> {
                     System.out.println("===================================================================");
                     OperacionesMenu.buscarClientes(clientes, sc);
                     System.out.println("===================================================================");
+                    almacenamientoJSON.escribirClientes(clientes);
+                    almacenamientoJSON.escribirPagos(pagos);
                 }
                 case 4 -> {
                     System.out.println("===================================================================");
                     pagos = OperacionesMenu.procesarPagoRepostaje(pagos, clientes, sc);
                     System.out.println("===================================================================");
+                    almacenamientoJSON.escribirClientes(clientes);
+                    almacenamientoJSON.escribirPagos(pagos);
                 }
                 case 5 -> {
                     System.out.println("===================================================================");
                     OperacionesMenu.consultarPagos(pagos);
                     System.out.println("===================================================================");
+                    almacenamientoJSON.escribirClientes(clientes);
+                    almacenamientoJSON.escribirPagos(pagos);
                 }
                 default -> {
-                    //Guardamos los cambios antes de cerrar el programa.
-                    almacenamientoCSV.escribirClientes(clientes);
-                    almacenamientoCSV.escribirPagos(pagos);
-
                     System.out.println("===================================================================");
                     System.out.println("Has salido del programa.");
                     System.out.println("===================================================================");
