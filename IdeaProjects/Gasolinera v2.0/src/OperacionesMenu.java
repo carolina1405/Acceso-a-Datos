@@ -10,9 +10,10 @@ public class OperacionesMenu {
     //para usarlos, así que serán estáticos.
     //========================================================================================================================================
     public static List<Cliente> altaCliente(List<Cliente> clientes, Scanner sc){
-        String matricula = comprobarMatricula(sc, clientes);
+        String matricula = comprobarMatricula(sc, clientes); //Dado que si la matrícula está repetida hay que abortar la operación
+                                                                //de dar de alta a un cliente mejor la pedimos primero para ahorrarnos molestias.
 
-        if(matricula != null){
+        if(matricula != null){ //Si la matrícula ya existe el método de comprobación devolverá un null y no continuará la operación.
             String nombre = comprobarNombre(sc),
                     telefono = comprobarTelefono(sc);
             clientes.add(new Cliente(clientes.size()+1, nombre, telefono, matricula));
@@ -84,7 +85,7 @@ public class OperacionesMenu {
             System.out.println("La matrícula ya ha sido registrada para otro cliente." +
                     "\nNo se ha guardado el nuevo cliente.");
             System.out.println("=========================================================");
-            return null;
+            return null; //En caso de que la matrícula ya exista devolvemos un null.
         }
 
         return matr.toUpperCase();
@@ -131,20 +132,20 @@ public class OperacionesMenu {
         }else{
             String clave = comprobarClave(sc);
             System.out.println("Buscando...");
-            List<Cliente> coincidencias = clientes.stream()
+            List<Cliente> coincidencias = clientes.stream()   //Esta versión busca con streams para optimizar las líneas de código.
                     .filter(cliente ->
-                            (cliente.getNombre() != null && cliente.getNombre().toLowerCase().contains(clave.toLowerCase())) ||
-                            (cliente.getTelefono() != null && cliente.getTelefono().contains(clave)) ||
+                            (cliente.getNombre() != null && cliente.getNombre().toLowerCase().contains(clave.toLowerCase())) || //Filtramos las coincidencias con la clave
+                            (cliente.getTelefono() != null && cliente.getTelefono().contains(clave)) ||                         //para nombre, teléfono y matrícula.
                             (cliente.getMatricula() != null && cliente.getMatricula().toLowerCase().contains(clave.toLowerCase())))
-                    .sorted()
-                    .toList();
+                    .sorted() //Ordenamos la lista con los resultados (si los hay)
+                    .toList(); //Devolvemos una lista inmutable con los resultados.
             System.out.println("-----RESULTADOS DE BÚSQUEDA--------------------------------");
             if(coincidencias.isEmpty()){
                 System.out.println("No se han encontrado coincidencias.");
             }else{
-                String formatoColumnas = "%-5s %-25s %-15s %-12s%n";
+                String formatoColumnas = "%-5s %-25s %-15s %-12s%n"; //He usado esto para formatear las columnas cada vez que haya que mostrar información.
                 System.out.printf(formatoColumnas, "ID","NOMBRE","TELÉFONO","MATRÍCULA");
-                coincidencias.stream()
+                coincidencias.stream() //He usado un stream para mostrar los resultados en lugar de un bucle for-each, para que sea más limpio.
                         .sorted()
                         .forEach(cliente -> System.out.printf(formatoColumnas,
                                 cliente.getID(), cliente.getNombre(), cliente.getTelefono(), cliente.getMatricula()));
@@ -177,21 +178,21 @@ public class OperacionesMenu {
     //========================================================================================================================================
     public static List<PagoRepostaje> procesarPagoRepostaje(List<PagoRepostaje> pagos, List<Cliente> clientes, Scanner sc){
 
-        if(clientes.isEmpty()){
+        if(clientes.isEmpty()){ //Si no hay clientes no se procesará ningún pago.
             System.out.println("Aún no hay clientes registrados. " +
                     "\nPara procesar un pago debes tener registrado al menos un cliente.");
-        }else{
-            listarClientes(clientes);
+        }else{ //Si los hay se mostrarán.
+            listarClientes(clientes); //Reciclamos este método para ahorrar código.
             int idCliente = comprobarFormatoIDCliente(sc);
-            Cliente c = clientes.stream()
+            Cliente c = clientes.stream() //Usamos streams para recoger el cliente cuyo id coincida con el introducido por el usuario.
                     .filter(cliente -> cliente.getID() == idCliente)
-                    .findFirst().orElse(null);
-            if(c == null){
+                    .findFirst().orElse(null); //Como el id es único sólo habrá un cliente, como mucho, que lo posea, y si nadie lo tiene entonces devolverá null.
+            if(c == null){ //Suponiendo que no haya nadie se lo comunicamos al usuario y abandonamos la operación.
                 System.out.println("===================================================================");
                 System.out.println("El cliente con id "+idCliente+" no existe. " +
                         "\nNo se ha registrado el pago.");
                 System.out.println("===================================================================");
-            }else {
+            }else { //Si lo hay seguimos adelante y pedimos el resto de datos para procesar el pago.
                 int idPago = pagos.size() + 1;
                 LocalDate fecha = comprobarFormatoFecha(sc);
                 double importe = comprobarFormatoImporte(sc);
@@ -200,6 +201,7 @@ public class OperacionesMenu {
 
                 pagos.add(new PagoRepostaje(idPago, idCliente, fecha, importe, litros, combustible));
 
+                //Mostramos un mensaje con la información del nuevo pago.
                 String formatoExito = "%-6s %-20s %-12s%n";
                 System.out.println("-----------------------------------------");
                 System.out.println("Se ha guardado correctamente el pago con:");
@@ -352,8 +354,8 @@ public class OperacionesMenu {
             String formatoColumnas = "%-6s %-16s %-12s %-12s %-10s %-14s%n";
             System.out.println("=================== PAGOS REGISTRADOS ====================");
             System.out.printf(formatoColumnas, "ID","ID DEL CLIENTE","FECHA","IMPORTE","LITROS","COMBUSTIBLE");
-            pagos.stream()
-                 .sorted()
+            pagos.stream() //Con un stream ordenamos el listado, mostramos cada dato y formateamos la fecha para que se muestre correctamente aún usando el printf con
+                 .sorted() //formato para columnas.
                  .forEach(pago -> System.out.printf(formatoColumnas,
                          pago.getId(), pago.getIdCliente(),
                          pago.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),

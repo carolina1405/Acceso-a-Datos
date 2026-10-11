@@ -3,8 +3,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 public class PagoConverter implements CSVConverter<PagoRepostaje>{
+    //Equivalente de ClienteConverter para pagos.
     String separador;
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); //Para asegurarnos de que las fechas se
+                                                                                //mantengan en el formato deseado tanto en la lectura
+                                                                                //como en el guardado.
+
+
     public PagoConverter(String separador) {
         this.separador = separador;
     }

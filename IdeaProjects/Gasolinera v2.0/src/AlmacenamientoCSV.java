@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class AlmacenamientoCSV implements Almacenamiento{
+    /*Clase que implementa la interfaz de Almacenamiento para CSV para clientes y pagos*/
     Path directorio;
     Path archivoClientes;
     Path archivoPagos;
