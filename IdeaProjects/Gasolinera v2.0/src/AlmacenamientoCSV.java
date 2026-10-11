@@ -26,11 +26,18 @@ public class AlmacenamientoCSV implements Almacenamiento{
 
             if(Files.notExists(archivoClientes)){
                 Files.createFile(archivoClientes);
+                encabezado = "ID,Nombre,Teléfono,Matrícula\n";
+                Files.writeString(archivoClientes, encabezado);
             }
 
             if(Files.notExists(archivoPagos)){
                 Files.createFile(archivoPagos);
+                encabezado = "ID,ID del Cliente,Fecha,Importe,Litros,Combustible\n";
+                Files.writeString(archivoPagos, encabezado);
             }
+
+
+
         }catch (IOException e){
             System.out.println("ERROR: "+e.getMessage());
         }

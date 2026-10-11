@@ -25,11 +25,16 @@ public class AlmacenamientoJSON implements Almacenamiento{
 
             if(Files.notExists(archivoClientes)){
                 Files.createFile(archivoClientes);
+                Files.writeString(archivoClientes, prefijo+sufijo);
             }
 
             if(Files.notExists(archivoPagos)){
                 Files.createFile(archivoPagos);
+                Files.writeString(archivoPagos, prefijo+sufijo);
             }
+
+
+
         }catch (IOException e){
             System.out.println("ERROR: "+e.getMessage());
         }
