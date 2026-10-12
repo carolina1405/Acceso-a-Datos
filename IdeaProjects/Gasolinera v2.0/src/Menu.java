@@ -21,7 +21,7 @@ public class Menu {
 
 
 
-
+        //=========================================================================================
 
         //Creamos un almacenamiento para leer/escribir en el formato deseado.
         Almacenamiento almacenamiento = null;
@@ -64,15 +64,22 @@ public class Menu {
         String ficheroPagos = "pagos.json";
         
         if(!rutas.isEmpty()){ //Si ya existían archivos .json comprobamos que cumplan con los requisitos de nombre.
-            directorio = rutas.get(0).getParent().toString();
+            String directorioPrueba = rutas.get(0).getParent().toString();
+            boolean mismoDirectorio1 = false, mismoDirectorio2 = false; //Comprueban que ambos ficheros estén en el mismo directorio
             for (Path p : rutas) {
                 String nombreFichero = p.getFileName().toString(); //Cambiamos los valores por defecto si se cumplen estos requisitos.
-                if (nombreFichero.contains("pago")) {
+                if (nombreFichero.contains("pago") && p.getParent().toString().equals(directorioPrueba)) {
                     ficheroPagos = nombreFichero;
-                } else if (nombreFichero.contains("cliente")) {
+                    mismoDirectorio1 = true;
+                } else if (nombreFichero.contains("cliente") && p.getParent().toString().equals(directorioPrueba)) {
                     ficheroClientes = nombreFichero;
+                    mismoDirectorio2 = true;
                 }
             }
+            if(mismoDirectorio1 && mismoDirectorio2){
+                directorio = directorioPrueba; //Solo se cambia si ambos ficheros.json están en el mismo directorio.
+            }
+
         }
 
         //Asignamos el directorio y nombres de ficheros resultantes de la exploración.
@@ -88,6 +95,8 @@ public class Menu {
 
         List<PagoRepostaje> lecturaPagos = almacenamiento.leerPagos();
         List<PagoRepostaje> pagos = new LinkedList<>(lecturaPagos);
+
+        //=========================================================================================
 
         //Esta es la lógica detrás del menú.
         do {
