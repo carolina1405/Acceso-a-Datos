@@ -49,12 +49,15 @@ public class PagoRepostaje implements Comparable<PagoRepostaje>{
         return Objects.hashCode(id);
     }
 
+
+
+    //---------------------------------------------------------
+
+    //G/S
     public int getId() {
         return id;
     }
 
-    //---------------------------------------------------------
-    //G/S
     public void setId(int id) {
         this.id = id;
     }
