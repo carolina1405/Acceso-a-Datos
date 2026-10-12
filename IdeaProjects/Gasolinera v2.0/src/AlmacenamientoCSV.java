@@ -16,13 +16,13 @@ public class AlmacenamientoCSV implements Almacenamiento{
     String encabezado;
 
     //COSNTRUCTOR
-    public AlmacenamientoCSV(){
-        this.directorio = Path.of("ArchivosCSV");
-        this.archivoClientes = directorio.resolve("clientes.csv");
-        this.archivoPagos = directorio.resolve("pagos.csv");
+    public AlmacenamientoCSV(String directorio, String ficheroClientes, String ficheroPagos){
+        this.directorio = Path.of(directorio);
+        this.archivoClientes = this.directorio.resolve(ficheroClientes.replace(".csv", "")+".csv");
+        this.archivoPagos = this.directorio.resolve(ficheroPagos.replace(".csv", "")+".csv");
 
         try{
-            Files.createDirectories(directorio);
+            Files.createDirectories(this.directorio);
 
             if(Files.notExists(archivoClientes)){
                 Files.createFile(archivoClientes);

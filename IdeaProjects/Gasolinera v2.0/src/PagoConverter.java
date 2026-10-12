@@ -45,9 +45,9 @@ public class PagoConverter implements CSVConverter<PagoRepostaje>, JSONConverter
     public Function<PagoRepostaje, String> toJSON() {
         return pago -> "\t\t{\"id\": "+pago.getId()
                 +separador+"\"idCliente\": "+pago.getIdCliente()
-                +separador+"\"fecha\": "+"\""+pago.getFecha()+"\""
-                +separador+"\"importe\": "+String.format("%.2f", pago.getImporte())
-                +separador+"\"litros\": "+String.format("%.2f", pago.getLitros())
+                +separador+"\"fecha\": "+"\""+pago.getFecha().format(dateFormatter)+"\""
+                +separador+"\"importe\": "+String.format(java.util.Locale.US, "%.2f", pago.getImporte())
+                +separador+"\"litros\": "+String.format(java.util.Locale.US, "%.2f", pago.getLitros())
                 +separador+"\"combustible\": "+"\""+pago.getCombustible()+"\"}";
     }
 

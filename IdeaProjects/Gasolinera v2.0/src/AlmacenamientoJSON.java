@@ -15,13 +15,13 @@ public class AlmacenamientoJSON implements Almacenamiento{
     String prefijo = "{\n\t[\n", sufijo = "\n\t]\n}";
 
     //CONSTRUCTOR
-    public AlmacenamientoJSON() {
-        this.directorio = Path.of("ArchivosJSON");
-        this.archivoClientes = directorio.resolve("clientes.json");
-        this.archivoPagos = directorio.resolve("pagos.json");
+    public AlmacenamientoJSON(String directorio, String ficheroClientes, String ficheroPagos) {
+        this.directorio = Path.of(directorio);
+        this.archivoClientes = this.directorio.resolve(ficheroClientes.replace(".json", "")+".json");
+        this.archivoPagos = this.directorio.resolve(ficheroPagos.replace(".json", "")+".json");
 
         try{
-            Files.createDirectories(directorio);
+            Files.createDirectories(this.directorio);
 
             if(Files.notExists(archivoClientes)){
                 Files.createFile(archivoClientes);
