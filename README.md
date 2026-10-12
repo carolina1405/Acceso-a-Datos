@@ -1,574 +1,171 @@
-[README.md](https://github.com/user-attachments/files/32852869/README.md)
-# GasolineraCSV
- 
+[README.md](https://github.com/user-attachments/files/33358509/README.md)
+# Gasolinera v2.0
+
 ## Descripción
-Este proyecto está desarrollado en Java y ha sido compilado y probado utilizando **JDK 21**.
- 
+
+Este proyecto es una aplicación de consola desarrollada en Java para la gestión de clientes y repostajes en una estación de servicio. Implementa una arquitectura modular desacoplada mediante una interfaz `Almacenamiento` con persistencia dual en archivos **CSV** y **JSON**, optimizada mediante el uso de programación funcional (Java Streams) e interfaces funcionales (`Function<T, U>`).
+
+Cuenta con una clase traductora `MigraCSVToJson` que automatiza la migración de datos bajo una estricta regla transaccional de "Todo o Nada" en el primer arranque del sistema.
+
 ## Requisitos
- 
+
 - Java Development Kit (JDK) 21 o superior.
 - Terminal o consola de comandos.
 
+## Estructura del Formato JSON
+
+El almacenamiento jerárquico se genera de forma artesanal respetando las tabulaciones anidadas requeridas:
+
+```json
+{
+	[
+		{"id": 1,"nombre": "Ana López","telefono": "600123456","matricula": "1234ABC"},
+		{"id": 2,"nombre": "Óscar López","telefono": "654321098","matricula": "1234CBC"}
+	]
+}
+```
+
+*Nota: Los importes y litros se almacenan estrictamente con puntos decimales sin comillas mediante el estándar `java.util.Locale.US`, mientras que las fechas guardan el formato español `dd/MM/yyyy`.*
+
+## Procedimiento de Migración
+
+1. **Exploración Inicial:** En cada arranque, el programa escanea el directorio en busca de archivos `.json` existentes.
+2. **Intercepción:** Si no se localiza ningún archivo JSON (primer arranque), se pregunta al usuario: `¿Hay ficheros .csv que migrar (S/N)?: `.
+3. **Validación Atómica:** Si se responde `S`, se solicitan las rutas. Los datos se cargan y validan en la memoria RAM. Si una sola línea del CSV contiene datos corruptos, la migración se cancela con un mensaje de error y el destino permanece intacto (sin generar archivos vacíos ni parciales).
+4. **Arranques Posteriores:** Si la migración se completa o ya existían datos, el programa se auto-configura localizando la carpeta de trabajo dinámicamente y carga el menú directo sin volver a preguntar.
+
 ## Compilación
- 
+
 Desde la raíz del proyecto, ejecutar:
- 
+
 ```bash
 javac -d bin src\*.java
 ```
- 
+
 Esto generará los archivos `.class` en el directorio `bin`.
 
 ## Ejecución
- 
-Una vez compilado, ejecutar:
- 
+
+Una vez compilado, ejecutar el siguiente comando (forzando la codificación universal para asegurar la correcta visualización de tildes, eñes y el símbolo del euro `€`):
+
 ```bash
-java -cp bin Main
+java -Dfile.encoding=UTF-8 -cp bin Gasolinera
 ```
 
-## Ubicación y formato de los ficheros
+## Guía de Operaciones del Menú
 
-Por defecto, los ficheros se generarán en un directorio llamado ArchivosCSV, que debe estar en el directorio actual (de no existir o no encontrarse en el directorio actual se generará uno nuevo).
+* **1. Dar de alta un cliente:** Añade un usuario y guarda los cambios en el disco inmediatamente después de la operación.
+* **2. Listar clientes:** Muestra los registros alineados geométricamente por columnas mediante `printf`.
+* **3. Buscar clientes:** Filtro funcional avanzado por nombre, teléfono o matrícula (Ignora mayúsculas/minúsculas).
+* **4. Procesar un pago de repostaje:** Vincula un ticket de combustible a un cliente existente validado mediante Streams.
+* **5. Consultar pagos:** Muestra el historial completo de repostajes formateado con sus unidades de medida (`€` y `L`).
+* **0. Salir:** Finaliza la ejecución del programa de forma segura.
 
-Cada fichero será un archivo con extensión .csv, y se creará uno para clientes y otro para pagos, llamándose Clientes y Pagos. Si los ficheros ya existen en el directorio ArchivosCSV no se generarán nuevos.
+## Dependencias
 
-Se han incluido encabezados en los ficheros.
+Este proyecto no tiene dependencias de librerías externas.
 
-## Decisiones de diseño
+Dependencias nativas del sistema: 
 
-Incluyendo al Main, el programa se divide en un total de 10 clases, enumeración (enum) y una interfaz. Todos los componentes se encuentran dentro del mismo paquete.
+- java.base / java.nio.file: Encargado de la gestión moderna de rutas, directorios y escritura atómica en el disco duro (Path, Files)
+- java.util.stream: Utilizado para el procesamiento funcional de los datos en las lecturas, búsquedas y escrituras lineales (Stream, Collectors)
+- java.util.function: Responsable del acoplamiento y optimización de tus conversores mediante funciones encadenables (Function<T, U>)
+- java.time: Utilizado para el manejo estructurado y formateo de los campos temporales (LocalDate, DateTimeFormatter)
 
-1- Cliente
+## Detalles de la aplicación
 
-### Identificación única mediante id
+### Interfaz Almacenamiento
 
-Se ha decidido que el atributo id sea el identificador único de cada cliente. Por ello, los métodos equals() y hashCode() utilizan exclusivamente este atributo para determinar si dos objetos representan al mismo cliente.
+Interfaz encargada de definir los métodos de escritura/lectura para cada objeto dependiendo del formato del archivo. La implementarán las clases AlmacenamientoCSV y AlmacenamientoJSON.
 
-Ventajas:
+### AlmacenamientoCSV
 
--Evita duplicidades en colecciones como HashSet.
--Permite localizar clientes de forma eficiente.
--El nombre, teléfono o matrícula pueden modificarse sin afectar a la identidad del objeto.
--Ordenación natural mediante Comparable
+Clase encargada de gestionar la lectura/escritura de clientes y pagos en archivos CSV. Implementa la interfaz Almacenamiento. En caso de no existir archivos CSV con los nombres y el directorio pasados como parámetros de su constructor los crea automáticamente. 
 
-### La clase implementa la interfaz Comparable<Cliente> para definir un criterio de ordenación natural.
+En ella se realizan las conversiones de objetos a formato CSV mediante instancias de las clases convertidoras.
 
-El método compareTo() sigue dos niveles de comparación:
+###  AlmacenamientoJSON
 
--Comparación alfabética del nombre (nombre) ignorando mayúsculas y minúsculas mediante compareToIgnoreCase().
--Si los nombres coinciden, se utiliza el id como criterio de desempate.
+Es la equivalente de AlmacenamientoCSV pero para formato JSON.
 
-Con ello se consigue una ordenación estable y predecible cuando los objetos se almacenan en estructuras ordenadas como TreeSet o se ordenan mediante Collections.sort().
+### Interfaz CSVConverter
 
+Interfaz funcional que define los métodos para convertir a CSV o reconvertir a un objeto. Mediante la implementación de Function<T, U> los métodos podrán concatenarse en streams.
 
-2- PagoRepostaje
+### Interfaz JSONConverter
 
-### Identificación única mediante id
+Equivalente de CSVConverter para formato JSON.
 
-Cada pago de repostaje posee un identificador único (id). Por este motivo, los métodos equals() y hashCode() utilizan exclusivamente este atributo para determinar si dos objetos representan el mismo pago.
+### ClienteConverter
 
-Ventajas:
+Clase encargada de implementar los métodos de la interfaz CSVConverter. Los métodos están pensados para convertir de CSV a objeto de la clase Cliente y viceversa de forma manual, sin dependencias externas.
 
--Evita registros duplicados en colecciones basadas en hash.
--Facilita la búsqueda y gestión de pagos.
--Permite modificar otros atributos sin afectar a la identidad del objeto.
--Relación con el cliente mediante idCliente
+### PagoConverter
 
-En lugar de almacenar una referencia directa a un objeto Cliente, la clase guarda únicamente el identificador del cliente (idCliente). Esta decisión reduce el acoplamiento entre clases y simplifica la persistencia y recuperación de datos.
+Equivalente de la clase ClienteConverter para los pagos. Implemena la interfaz JSONConverter.
 
-### Ordenación natural mediante Comparable
+### Combustible
 
-La clase implementa la interfaz Comparable<PagoRepostaje> para definir una ordenación natural basada en la fecha del repostaje.
+Enumeración para definir los tipos de combustibles disponibles en la gasolinera. En caso de ofrecerse nuevos combustibles, solo hay que añadirlos aquí. Esto evita que se introduzcan valores erróneos.
 
-El criterio de ordenación es:
+### Cliente
 
-Fecha (fecha) en orden descendente, mostrando primero los repostajes más recientes.
-En caso de empate, se utiliza el identificador (id) en orden descendente como criterio de desempate.
+Clase que define los objetos de tipo Cliente. Los clientes poseen un id, nombre, teléfono y matrícula como atributos. Además implementa la interfaz Comparable, la cual establece un criterio de ordenación natural basado en el nombre (ascendente), y luego en el id (ascendente). 
 
-Esto resulta especialmente útil para mostrar historiales de repostajes en orden cronológico inverso.
+Además, también implementa los métodos equals y hashCode para establecer los criterios que determinan la diferencia entre 2 clientes.
 
-### Uso de LocalDate
+La clase cuenta con getters/setters para todos los atributos.
 
-Se ha utilizado la clase LocalDate para representar la fecha del repostaje, ya que únicamente es necesario almacenar la fecha y no la hora. Esta solución proporciona una representación más clara y evita problemas relacionados con zonas horarias.
+### PagoRepostaje
 
-Uso de enumeración para el combustible
+Clase que define los objetos de tipo PagoRepostaje. Los pagos poseen un id, idCliente, fecha, importe, litros y combustible como atributos. Además implementa la interfaz Comparable, la cual establece un criterio de ordenación natural basado en la fecha (descendente), y luego en el id (descendente). 
 
-El atributo combustible utiliza el tipo enumerado Combustible, lo que garantiza que únicamente puedan asignarse valores válidos y predefinidos.
+Además, también implementa los métodos equals y hashCode para establecer los criterios que determinan la diferencia entre 2 pagos.
 
-Ventajas:
+La clase cuenta con getters/setters para todos los atributos.
 
--Evita errores de escritura.
--Mejora la legibilidad del código.
--Facilita futuras ampliaciones de tipos de combustible.
+### Menu
 
-3- Menu
+Clase encargada de mostrar el menú y solicitar al usuario que elija una de las opciones que ofrece. Antes de mostrarlo, se lleva a cabo una exploración en el directorio actual para comprobar que no existan archivos .json ya creados. Si no los encuentra (lo normal si se trata del primer arranque) se le pregunta al usuario si desea migrar los datos existentes en archivos CSV a JSON. Si el usuario responde "S" se piden el directorio de origen y de destino y se inicia la migración. 
 
-### Centralización de la interacción con el usuario
+En caso de que el usuario responda "N" o la migración falle (se informará al usuario del error antes de pasar a mostrar el menú y no actuará como si no hubiese fallado), simplemente pasará directamente a mostrar el menú, no sin antes crear un nuevo directorio con archivos .json con nombres pasados por defecto. Para que en arranques posteriores se pueda acceder a las rutas de archivos .json ya existentes, se vuelve a realizar una exploración para buscar esos archivos. En caso de que no existan o no cumplan con los requisitos hay nombres por defectos ya creados (como he mencionado antes) para el directorio y los archivos y poder continuar con la ejecución. 
 
-La clase Menu actúa como punto de entrada de la aplicación y centraliza toda la interacción con el usuario a través de la consola.
+En cualquier caso se creará un objeto de tipo Almacenamiento para abstraer los métodos implementados por cada tipo de almacenamiento.
 
-Su responsabilidad principal es:
+En el menú se abre y cierra el Scanner que se utilizará a lo largo del programa.
 
--Mostrar las opciones disponibles.
--Solicitar la opción elegida.
--Invocar la funcionalidad correspondiente.
--Gestionar la persistencia de datos al finalizar el programa.
+### OperacionesMenu
 
-De esta forma se separa la lógica de presentación de la lógica de negocio.
+Clase encargada de implementar la lógica detrás de cada opción del menú. Esta clase utiliza métodos estáticos ya que no hay necesidad de crear una instancia de esta clase pues solo contiene métodos. También alberga métodos privados para controlar los datos introducidos en cada caso, evitando que el usuario rompa el programa.
 
-Uso de un bucle de ejecución continuo
+### MigraCSVToJson
 
-Se ha utilizado una estructura do-while para mantener el menú activo hasta que el usuario seleccione la opción de salida (0).
+Clase encargada de ofrecer un único método estático encargado de realizar la migración oficialmente de formato CSV a JSON. Está diseñada para no modificar en lo absoluto los datos existentes en los archivos .csv y en caso de fallar en algún momento la migración se detendrá inmediatamente mostrando la causa del error. 
 
-Esto permite realizar múltiples operaciones durante la misma ejecución sin necesidad de reiniciar el programa.
+Suponiendo que se complete con éxito se informará al usuario de los clientes y pagos migrados, y en todo momento se le informará del estado del proceso.
 
-### Separación entre menú y lógica de negocio
+### Gasolinera
 
-Las operaciones reales no se implementan directamente en la clase Menu, sino que se delegan a métodos estáticos de la clase Operaciones.
+Es el main de la app. Su única tarea es llamar al menú.
 
-Ventajas:
-
--Menor acoplamiento.
--Código más organizado.
--Mayor facilidad de mantenimiento.
--Posibilidad de reutilizar la lógica de negocio desde otras interfaces.
--Persistencia mediante repositorios
-
-Se emplean las clases RepoCliente y RepoPagos para gestionar la lectura y escritura de los archivos CSV.
-
-Esta decisión permite aislar la gestión de datos del resto de la aplicación y aplicar el principio de responsabilidad única.
-
-Al iniciar el programa:
-
--Se cargan los clientes desde el repositorio.
--Se cargan los pagos desde el repositorio.
-
-Al finalizar:
-
-Se guardan los cambios realizados en ambas colecciones.
-Uso de colecciones en memoria
-
-Tras la carga inicial, los datos se almacenan en listas (List<Cliente> y List<PagoRepostaje>).
-
-Esto evita acceder continuamente a los archivos CSV y mejora el rendimiento durante la ejecución de la aplicación.
-
-### Validación robusta de la entrada del usuario
-
-La selección de opciones del menú se realiza mediante el método privado comprobarOpcion().
-
-Este método valida que:
-
--El dato introducido sea numérico.
--El valor esté comprendido entre las opciones disponibles del menú.
-
-Para ello se utilizan excepciones:
-
--InputMismatchException: cuando el usuario introduce un dato no numérico.
--IllegalArgumentException: cuando el número está fuera del rango permitido.
-
-### Encapsulación de la validación
-
-La validación de la opción elegida se ha aislado en un método privado independiente (comprobarOpcion), evitando duplicar código y mejorando la legibilidad del método principal mostrarMenu().
-
-### Gestión de recursos
-
-Se utiliza un único objeto Scanner durante toda la ejecución del programa y se cierra al finalizar mediante sc.close();
-
-Con ello se liberan correctamente los recursos asociados a la entrada estándar.
-
-### Creación automática de los archivos de datos
-
-Los repositorios están diseñados para crear automáticamente el directorio y los archivos CSV necesarios en caso de que no existan.
-
-Esto facilita la primera ejecución de la aplicación y evita configuraciones previas por parte del usuario.
-
-4- CSVConverter
-
-### Uso de una interfaz genérica
-
-La interfaz se ha definido utilizando genéricos (<T>) para permitir que cualquier tipo de objeto pueda convertirse a formato CSV y reconstruirse posteriormente sin necesidad de crear interfaces específicas para cada clase.
-
-Ventajas:
-
--Reutilización de código.
--Mayor flexibilidad.
--Independencia respecto a las clases de dominio.
--Facilita la incorporación de nuevos tipos de objetos en el futuro.
--Separación de responsabilidades
-
-5- Repositorio
-
-### Uso de una clase abstracta genérica
-
-La clase se ha diseñado como una clase abstracta genérica. Esto permite reutilizar la misma estructura de persistencia para distintos tipos de objetos sin duplicar código.
-
-
-Ventajas:
-
--Reutilización.
--Mayor mantenibilidad.
--Facilita la incorporación de nuevas entidades.
--Reduce la duplicación de código.
-
-### Aplicación de herencia para repositorios específicos
-
-La clase define el comportamiento común a todos los repositorios, mientras que las clases hijas implementan los detalles concretos para cada tipo de dato.
-
-De esta forma se comparte la funcionalidad general y cada repositorio se especializa en su entidad correspondiente.
-
-### Creación automática del directorio de almacenamiento
-
-El constructor recibe la ruta del directorio donde se almacenarán los archivos y garantiza su existencia mediante Files.createDirectories(this.directorio). Esta decisión evita configuraciones manuales previas y permite que la aplicación funcione correctamente desde la primera ejecución. Files.createDirectories(this.directorio) solo se ejecutará si el directorio en cuestión no existe.
-
-### Abstracción de las operaciones de persistencia
-
-La clase define los métodos fundamentales de persistencia como abstractos:
-
-protected abstract void guardarCSV(List<T> lista);
-protected abstract List<T> listarCSV();
-
-Con ello se obliga a cada repositorio concreto a proporcionar su propia implementación para guardar y recuperar datos.
-
-### Preparación para futuras ampliaciones
-
-Además de las operaciones básicas de lectura y escritura, se define el método abstracto:
-
-protected abstract void generarCSV(String directorio, String archivo);
-
-Este diseño permite que cada repositorio pueda especificar cómo se genera inicialmente su archivo de almacenamiento.
-
-Asimismo, la arquitectura facilita incorporar en el futuro otros mecanismos de persistencia (XML, JSON o bases de datos) creando nuevas implementaciones sin modificar la estructura general.
-
-### Principio de responsabilidad única
-
-La responsabilidad de esta clase se limita exclusivamente a proporcionar la infraestructura común de acceso a los datos.
-
-Las clases de negocio (Cliente, PagoRepostaje, etc.) no necesitan conocer cómo se almacenan los datos, mientras que los repositorios especializados se encargan únicamente de la persistencia.
-
-### Gestión de errores de entrada y salida
-
-La creación del directorio se encuentra protegida mediante un bloque try-catch que captura posibles excepciones de tipo IOException.
-
-De esta forma se evita que un fallo en el sistema de archivos provoque la terminación inesperada de la aplicación y se informa al usuario del problema detectado.
-
-### Desacoplamiento entre almacenamiento y dominio
-
-El uso de genéricos permite que la lógica de persistencia sea independiente de los modelos de negocio.
-
-Gracias a ello, cualquier nueva entidad del sistema puede disponer de su propio repositorio simplemente heredando de Repositorio<T> e implementando los métodos necesarios, manteniendo una arquitectura flexible y escalable.
-
-6- RepoPagos
-
-### Especialización del repositorio genérico
-
-La clase RepoPagos hereda de Repositorio<PagoRepostaje>
-
-De esta forma reutiliza la infraestructura común de persistencia definida en la clase abstracta Repositorio y proporciona una implementación específica para la gestión de los pagos de repostaje.
-
-### Uso de cabeceras
-
-Tanto en esta clase como en RepoClientes, el método guardarCSV(List<T> lista) agrega automáticamente las cabeceras al escribir en el documento.
-
-### Conversión desacoplada mediante convertidores
-
-La transformación entre objetos y líneas CSV no se realiza directamente en el repositorio, sino mediante la clase PagoRepostajeConverter.
-
-Esta decisión separa la lógica de persistencia de la lógica de conversión.
-
-Ventajas:
-
--Menor acoplamiento.
--Mayor reutilización.
--Código más mantenible.
--Facilita cambios futuros en el formato de almacenamiento.
-
-### Gestión automática de recursos
-
-La lectura y escritura se realizan mediante bloques try-with-resources. Esto garantiza el cierre automático de los flujos de entrada y salida, incluso cuando se produce una excepción.
-
-### Encapsulación de la ruta del archivo
-
-La ubicación física del fichero se almacena en el atributo: 
-
-private Path archivoPagos;
-
-De esta forma la gestión de rutas queda centralizada dentro del repositorio y no es necesario que otras clases conozcan dónde se encuentra el archivo.
-
-### Gestión de excepciones de entrada y salida
-
-Las operaciones de acceso al sistema de archivos están protegidas mediante bloques try-catch para capturar posibles excepciones de tipo IOException.
-
-Esto permite informar al usuario de los errores detectados sin provocar la finalización inesperada de la aplicación.
-
-### Separación entre dominio y persistencia
-
-Los objetos PagoRepostaje no contienen información sobre cómo se almacenan o recuperan sus datos.
-
-Toda la responsabilidad de persistencia se concentra en RepoPagos, siguiendo el principio de responsabilidad única y manteniendo desacopladas las capas de dominio y almacenamiento.
-
-7- RepoCliente
-
-RepoCliente es el equivalente de RepoPagos para la entidad Cliente.
-
-8- Operaciones
-
-### Centralización de la lógica de negocio
-
-La clase Operaciones se ha creado para agrupar toda la lógica asociada a las distintas opciones del menú.
-
-De esta manera se evita sobrecargar la clase Menu con responsabilidades adicionales, manteniendo separadas la interfaz de usuario y la lógica de negocio.
-
-
-### Uso exclusivo de métodos estáticos
-
-Todos los métodos de la clase son estáticos.
-
-Esto se debe a que la clase no necesita almacenar estado propio ni mantener información entre llamadas.
-
-Por tanto, no es necesario crear instancias de Operaciones para ejecutar sus funcionalidades.
-
-Ventajas:
-
--Menor consumo de memoria.
--Uso más sencillo desde otras clases.
--Refleja claramente que la clase funciona como un conjunto de utilidades de negocio.
-
-### Programación defensiva
-
-Todos los datos introducidos por el usuario son validados antes de procesarse.
-
-Se comprueba, entre otros aspectos:
-
--Campos obligatorios vacíos.
--Formatos numéricos incorrectos.
--Fechas inválidas.
--Valores negativos.
--Identificadores incorrectos.
--Tipos de combustible inexistentes.
-
-Con ello se aumenta la robustez de la aplicación y se evita almacenar información inconsistente.
-
-### Búsqueda flexible de clientes
-
-La funcionalidad de búsqueda permite localizar clientes utilizando coincidencias parciales sobre:
-
--Nombre.
--Teléfono.
--Matrícula.
-
-Para ello se utiliza contains() e ignorando diferencias entre mayúsculas y minúsculas mediante toUpperCase(). 
-
-Esta solución ofrece una experiencia más cómoda para el usuario al no exigir coincidencias exactas.
-
-### Garantía de unicidad de matrículas
-
-Durante el alta de clientes se verifica que la matrícula no exista previamente:
-
-if(c.getMatricula().equalsIgnoreCase(matricula))
-
-Esto evita registrar múltiples clientes asociados a la misma matrícula.
-
-
-### Ordenación mediante el criterio natural de las entidades
-
-Antes de mostrar los resultados se utiliza:
-
-sort(null)
-
-De esta forma la ordenación queda delegada en la implementación de Comparable de cada entidad.
-
-Clientes
-
--Nombre ascendente.
--ID como criterio de desempate.
-
-Pagos
-
--Fecha descendente.
--ID descendente como criterio de desempate.
-
-
-### Uso de enumeraciones para los combustibles
-
-Los tipos de combustible se validan mediante:
-
-Combustible.valueOf(...)
-
-Esta decisión garantiza que únicamente puedan registrarse combustibles definidos previamente en la enumeración Combustible.
-
-### Admisión de distintos formatos decimales
-
-Para facilitar la introducción de datos, los importes y litros aceptan tanto punto como coma decimal:
-
-line.replace(",", ".")
-
-Esto mejora la usabilidad para usuarios acostumbrados a formatos numéricos diferentes.
-
-### Uso de fechas modernas de Java
-
-Las fechas se gestionan mediante:
-
-LocalDate
-DateTimeFormatter
-
-lo que proporciona una gestión más segura y legible que las antiguas clases de fecha de Java.
-
-Además, si el usuario deja el campo vacío durante el registro de un pago, se utiliza automáticamente la fecha actual.
-
-### Gestión de operaciones sobre colecciones en memoria
-
-La clase trabaja directamente sobre las listas cargadas por los repositorios:
-
-List<Cliente>
-List<PagoRepostaje>
-
-Esto permite realizar todas las modificaciones en memoria y persistir los cambios únicamente cuando el usuario abandona la aplicación.
-
-### Identificadores autogenerados
-
-Los identificadores de clientes y pagos se generan automáticamente mediante:
-
-clientes.size() + 1
-pagos.size() + 1
-
-Esta decisión simplifica la creación de registros y evita que el usuario tenga que gestionar manualmente los IDs.
-
-### Retroalimentación constante al usuario
-
-Todas las operaciones muestran mensajes informativos sobre su resultado:
-
--Altas realizadas correctamente.
--Pagos registrados.
--Errores de validación.
--Ausencia de resultados.
--Operaciones canceladas.
-
-Esto mejora la experiencia de uso y facilita la detección de errores durante la interacción con la aplicación.
-
-
-9- Combustibles
-
-### Uso de una enumeración para representar los combustibles
-
-Los tipos de combustible disponibles se han definido mediante una enumeración (enum).
-
-Esta decisión garantiza que únicamente puedan utilizarse valores válidos y previamente definidos por la aplicación.
-
-### Integridad de los datos
-
-Al utilizar una enumeración, se evita que el usuario o el programador pueda registrar combustibles inexistentes o con errores tipográficos.
-
-
-### Mejora de la mantenibilidad
-
-Si en el futuro la gasolinera incorpora nuevos combustibles, únicamente será necesario añadir una nueva constante a la enumeración sin modificar el resto de la lógica de la aplicación..
-
-10- ClienteConverter
-
-### Implementación de la interfaz CSVConverter
-
-La clase implementa la interfaz genérica CSVConverter<Cliente> lo que la especializa en la conversión entre objetos Cliente y su representación en formato CSV.
-
-Esta decisión permite reutilizar una estructura común para todos los convertidores de la aplicación.
-
-
-### Separación entre conversión y persistencia
-
-La responsabilidad de esta clase se limita exclusivamente a transformar datos entre dos formatos:
-
-Objeto Cliente → línea CSV.
-Línea CSV → objeto Cliente.
-
-La lectura y escritura de archivos se delega al repositorio (RepoCliente), respetando el principio de responsabilidad única.
-
-### Conversión de objetos a CSV
-
-El método toCSV(Cliente cliente, String separador) genera una representación textual del cliente utilizando el separador indicado que permite almacenar los datos de forma sencilla y compatible con el formato CSV.
-
-### Reconstrucción de objetos desde CSV
-
-El método fromCSV(String line, String separador) permite reconstruir un objeto Cliente a partir de una línea leída del archivo.
-
-
-Para ello:
-
--Divide la línea utilizando el separador especificado.
--Convierte los datos al tipo correspondiente.
--Crea una nueva instancia de Cliente.
-
-### Uso de separadores parametrizados
-
-Aunque actualmente se utiliza la coma (",") como separador, el diseño permite utilizar cualquier otro carácter. 
-
-Esto aumenta la flexibilidad de la solución y facilita futuros cambios de formato.
-
-### Patrón de adaptación de datos
-
-La clase actúa como un adaptador entre el modelo de dominio (Cliente) y el formato de almacenamiento (CSV).
-
-De esta forma:
-
-El objeto Cliente no necesita conocer el formato CSV.
-El repositorio no necesita conocer la estructura interna del objeto.
-La lógica de conversión queda centralizada en una única clase especializada.
-
-### Facilita el mantenimiento y la extensibilidad
-
-Si en el futuro cambia la estructura del archivo CSV o se añaden nuevos atributos al cliente, únicamente será necesario modificar esta clase sin afectar al resto del sistema.
-
-Esto reduce el impacto de los cambios y mejora la mantenibilidad de la aplicación.
-
-11- PagoRepostajeConverter
-
-Es el equivalente de ClienteConverter para PagosRepostaje.
-
-12- Main
-
-### Delegación de responsabilidades
-
-La clase no contiene lógica de negocio ni lógica de presentación.
-
-Su única función es crear una instancia de la clase Menu y transferirle el control de la aplicación:
-
-Menu menu = new Menu();
-menu.mostrarMenu();
-
-Esta decisión mantiene un diseño limpio y favorece la separación de responsabilidades.
-
-### Bajo acoplamiento
-
-Main únicamente conoce la existencia de la clase Menu.
-
-No necesita conocer:
-
-Cómo se gestionan los clientes.
-Cómo se registran los pagos.
-Cómo funciona la persistencia.
-Cómo se realizan las validaciones.
-
-Esto reduce el acoplamiento entre componentes y mejora la mantenibilidad de la aplicación.
-
-
-
-### Facilita futuras ampliaciones
-
-Al mantener el punto de entrada aislado, resulta sencillo incorporar futuras tareas de inicialización, como:
-
-Cargar configuraciones.
-Inicializar una base de datos.
-Registrar logs.
-Configurar servicios externos.
-
-sin modificar la lógica del resto del sistema.
-
-
-### Principio de responsabilidad única
-
-La responsabilidad de Main se limita exclusivamente a arrancar la aplicación.
-
-Toda la lógica funcional queda delegada a las clases especializadas (Menu, Operaciones, repositorios y entidades), manteniendo una arquitectura más organizada y fácil de mantener.
-
-
----
 Autora: Carolina Barrameda Domínguez
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
